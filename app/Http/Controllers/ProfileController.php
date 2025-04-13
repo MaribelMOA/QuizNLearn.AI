@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use App\Models\Plan;
+use App\services\UsageService;
 
 class ProfileController extends Controller
 {
@@ -103,4 +104,14 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+
+    public function showFeatures(Request $request)
+    {
+        $userId = $request->user()->id;
+        $usos =UsageService::calculateAvailableUses($userId);
+
+        return view('features.index', compact('usos'));
+    }
+
 }

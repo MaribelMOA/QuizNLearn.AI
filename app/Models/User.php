@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Seeders\XpTransactionSeeder;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -70,4 +71,32 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsTo(Plan::class, 'current_plan_id');
     }
+
+// app/Models/User.php
+
+    public function quizzes()
+    {
+        return $this->hasMany(Quiz::class);
+    }
+
+    public function summaries()
+    {
+        return $this->hasMany(Summary::class);
+    }
+
+    public function gameHistory()
+    {
+        return $this->hasMany(GameHistory::class);
+    }
+
+    public function featureTransactions()
+    {
+        return $this->hasMany(FeatureTransaction::class);
+    }
+
+    public function xpTransactions()
+    {
+        return $this->hasOne(XpTransaction::class);
+    }
+
 }
