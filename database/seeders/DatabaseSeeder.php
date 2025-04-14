@@ -33,6 +33,12 @@ class DatabaseSeeder extends Seeder
             FeatureTransactionSeeder::class,
             XpTransactionSeeder::class,
 
+            QuestionTypeSeeder::class,
+            QuizSeeder::class,
+            QuizQuestionSeeder::class,
+            QuizQuestionTypeSyncSeeder::class, // <- aquí
+            QuizAnswerSeeder::class,
+
         ]);
     }
 }

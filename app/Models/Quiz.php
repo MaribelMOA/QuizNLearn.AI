@@ -31,9 +31,20 @@ class Quiz extends Model
     {
         return $this->hasMany(QuizQuestion::class);
     }
+    // app/Models/Quiz.php
+    public function questionTypes(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(QuestionType::class, 'quiz_question_type');
+    }
 
     /**
      * Obtener los resultados del cuestionario.
      */
+    // En tu modelo Quiz.php
+    public function gameHistories()
+    {
+        return $this->hasMany(GameHistory::class);
+    }
+
 
 }

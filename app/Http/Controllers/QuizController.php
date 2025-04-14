@@ -5,15 +5,18 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreQuizRequest;
 use App\Http\Requests\UpdateQuizRequest;
 use App\Models\Quiz;
+use App\models\GameHistory;
 use App\Models\Summary;
 use App\Services\UsageService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 
 
 class QuizController extends Controller
 {
+    use AuthorizesRequests;
     /**
      * Display a listing of the quizzes.
      */
@@ -38,7 +41,7 @@ class QuizController extends Controller
         }
 
         // Filtrar por dificultad
-        if ($request->has('difficulty_level') && !empty($request->difficulty)) {
+        if ($request->has('difficulty') && !empty($request->difficulty)) {
             $query->where('difficulty_level', $request->difficulty);
         }
 
@@ -48,7 +51,28 @@ class QuizController extends Controller
         }
 
         // Obtener cuestionarios paginados
-        $questionnaires = $query->withCount('quizQuestions')->latest()->paginate(9);
+//        $questionnaires = $query->with(['questionTypes', 'quizQuestions']) // Cargar tipos de preguntas y preguntas
+//        ->withCount('quizQuestions') // Contar las preguntas asociadas
+//        ->latest() // Ordenar por fecha de creación
+//        ->paginate(5);
+
+        // Obtener cuestionarios, ordenados primero por el uso más reciente y luego por la fecha de creación
+        $questionnaires = $query->with(['questionTypes', 'quizQuestions', 'gameHistories']) // Cargar las relaciones necesarias
+        ->withCount('quizQuestions')
+            ->orderByDesc(GameHistory::selectRaw('MAX(created_at)') // Primero por la fecha más reciente de uso
+            ->whereColumn('quiz_id', 'quizzes.id')
+                ->limit(1)) // Selecciona el último uso para cada quiz
+            ->orderByDesc('created_at') // Luego por la fecha de creación (más reciente)
+            ->paginate(5);
+
+
+
+        // Agregar la verificación de preguntas abiertas para cada cuestionario
+        foreach ($questionnaires as $quiz) {
+            $quiz->hasOpenQuestions = $quiz->questionTypes->contains(function($type) {
+                return $type->name === 'Open Questions';  // Cambia 'Open' al nombre adecuado de tu tipo de pregunta
+            });
+        }
 
         // Obtener estadísticas del usuario
         $totalQuizzes = Quiz::where('user_id', $user->id)->count();
@@ -59,7 +83,8 @@ class QuizController extends Controller
         $availableCreations = $uses['quiz_creation']['remaining']?? 4;
         $studyModeUses = $uses['study_mode']['remaining']?? 5;
         $arenaModeUses = $uses['arena_mode']['remaining']?? 6;
-
+//        $studyModeUses = 0;
+//        $arenaModeUses = 0;
 
         return view('quizzes.index', compact(
             'questionnaires',

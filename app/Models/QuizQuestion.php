@@ -22,4 +22,11 @@ class QuizQuestion extends Model
     public function quizQuestionAnswers(){
         return $this->hasMany(QuizAnswer::class);
     }
+
+    // app/Models/QuizQuestion.php
+    public function type()
+    {
+        return $this->belongsTo(QuestionType::class, 'question_type_id');
+    }
+
 }
