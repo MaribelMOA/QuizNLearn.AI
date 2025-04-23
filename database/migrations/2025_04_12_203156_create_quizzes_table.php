@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('num_questions');
             $table->enum('difficulty_level', ['Easy', 'Medium', 'Hard']);
             $table->enum('mode', ['Quiz', 'Study', 'Arena']);
-            $table->json('quiz_data');
+            $table->json('quiz_data')->nullable();
             $table->timestamps();
         });
     }

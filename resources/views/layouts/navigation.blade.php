@@ -5,17 +5,17 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
+                    <a href="{{ route('quizzes.index') }}">
                         <img src="{{ asset('images/logo.png') }}" alt="Logo" class="block h-10 w-auto">
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="hover:text-blue-500 text-lg">
+                   <!-- <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="hover:text-blue-500 text-lg">
                         <i class="fas fa-house mr-1"></i>
                         {{ __('Dashboard') }}
-                    </x-nav-link>
+                    </x-nav-link>-->
 
                     <x-nav-link :href="route('quizzes.index')" :active="request()->routeIs('quizzes.*')" class="hover:text-blue-500 text-lg">
                         <i class="fas fa-list-check mr-1"></i>
@@ -90,9 +90,10 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="sm:hidden hidden">
         <div class="pt-2 pb-3 space-y-1">
+            <!--
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="hover:text-blue-500">
                 <i class="fas fa-house mr-1 text-primary"></i> {{ __('Dashboard') }}
-            </x-responsive-nav-link>
+            </x-responsive-nav-link>-->
 
             <x-responsive-nav-link :href="route('quizzes.index')" :active="request()->routeIs('quizzes.*')" class="hover:text-blue-500">
                 <i class="fas fa-list-check mr-1 text-primary"></i> {{ __('Quiz List') }}

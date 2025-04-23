@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\UserPlan;
 use App\Models\Plan;
 use App\Services\UsageService;
@@ -115,7 +116,10 @@ class UserPlanController extends Controller
                 'start_date' => now(),
                 'end_date'   => now()->addDays(30),
             ]);
+            $newPlan = $currentUserPlan;
+
         }
+
 
         $usos =UsageService::calculateAvailableUses($userId);
       //  return response()->json($usos);

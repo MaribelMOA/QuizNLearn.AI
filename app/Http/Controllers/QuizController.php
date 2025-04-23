@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateQuizRequest;
 use App\Models\Quiz;
 use App\models\GameHistory;
 use App\Models\Summary;
+use App\Models\UserPlan;
 use App\Services\UsageService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -85,14 +86,41 @@ class QuizController extends Controller
         $arenaModeUses = $uses['arena_mode']['remaining']?? 6;
 //        $studyModeUses = 0;
 //        $arenaModeUses = 0;
+     //   $availableCreations=0;
+
+
+        $currentUserPlan = UserPlan::where('user_id', $userId)
+            ->where('end_date', '>=', now()) // Solo los planes activos
+            ->latest('end_date') // El más reciente
+            ->first();
+
+        // Si no se encuentra un plan activo
+        if (!$currentUserPlan) {
+            // Puedes devolver valores por defecto o manejar el error según lo necesites
+           // return response()->json(['error' => 'No active plan found for the user'], 400);
+        }
+
+        // Ahora obtenemos los datos del plan desde la tabla `plans` (suponiendo que tienes la relación 'plan')
+        $plan = $currentUserPlan->plan; // Esto asume que tienes la relación 'plan' definida en tu modelo `UserPlan`
+
+        // Extraer los límites del plan
+        $planLimits = [
+            'max_questions' => $plan->max_questions ?? 10,
+            'pdf_files'     => $plan->pdf_files ?? 0,
+            'urls'          => $plan->urls ?? 0,
+            'text_limit'    => $plan->text_limit ?? 1000,
+        ];
+
 
         return view('quizzes.index', compact(
             'questionnaires',
             'totalQuizzes',
             'availableCreations',
             'studyModeUses',
-            'arenaModeUses'
-        ));  }
+            'arenaModeUses',
+            'planLimits'
+        ));
+    }
 
     /**
      * Show the form for creating a new quiz.
@@ -120,11 +148,12 @@ class QuizController extends Controller
         $user = Auth::user();
         $uses =UsageService::calculateAvailableUses($user->id);
         // Estos valores vendrían de la suscripción del usuario o configuración
-        $availableCreations = $uses['quiz_creation']['remaining']?? 4;
-        if($availableCreations>0){
-            return redirect()->route('quizzes.index')
-                ->with('error', 'No tienes creaciones de cuestionarios disponibles.');
-        }
+//        $availableCreations = $uses['quiz_creation']['remaining']?? 4;
+//        if($availableCreations>0){
+//            return redirect()->route('quizzes.index')
+//                ->with('error', 'No tienes creaciones de cuestionarios disponibles.');
+//        }
+        $data = $request->validated(); // Obtiene solo los campos validados
 
         // Primero, guardamos el quiz con los datos proporcionados para mantener el registro
         $quiz = Quiz::create($request->validated());

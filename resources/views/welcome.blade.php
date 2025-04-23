@@ -132,16 +132,9 @@
                     <h3 class="text-xl font-semibold">Quiz Creation</h3>
                 </div>
                 <p class="text-gray-600 text-center">
-                    Generate customized quizzes from multiple sources with our intuitive editor.
+                    Generate customized quizzes from multiple sources with AI.
                 </p>
-                <div class="mt-6 text-center">
-                    <a href="#" class="text-primary hover:text-blue-700 font-medium inline-flex items-center">
-                        Learn more
-                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </a>
-                </div>
+
             </div>
 
             <!-- Feature 2 -->
@@ -155,14 +148,7 @@
                 <p class="text-gray-600 text-center">
                     Save, edit, and export quizzes as PDFs or JSON files for easy sharing.
                 </p>
-                <div class="mt-6 text-center">
-                    <a href="#" class="text-primary hover:text-blue-700 font-medium inline-flex items-center">
-                        Learn more
-                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </a>
-                </div>
+
             </div>
 
             <!-- Feature 3 -->
@@ -176,14 +162,7 @@
                 <p class="text-gray-600 text-center">
                     Earn XP and unlock new premium features as you learn and progress.
                 </p>
-                <div class="mt-6 text-center">
-                    <a href="#" class="text-primary hover:text-blue-700 font-medium inline-flex items-center">
-                        Learn more
-                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </a>
-                </div>
+
             </div>
         </div>
     </div>
@@ -229,7 +208,7 @@
             <div class="overflow-hidden rounded-lg shadow-lg transition-transform duration-300 hover:scale-[1.02]">
                 <div class="grid grid-cols-1 md:grid-cols-2">
                     <div class="bg-green-500 text-white p-8 flex flex-col justify-center">
-                        <h3 class="text-2xl md:text-3xl font-bold mb-4">Kahoot Mode</h3>
+                        <h3 class="text-2xl md:text-3xl font-bold mb-4">Arena Mode</h3>
                         <p class="text-lg">
                             Compete live with other users in an interactive experience.
                         </p>
@@ -272,7 +251,7 @@
                             <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
-                            <span>Quiz Creator (Limited)</span>
+                            <span>15 Quiz Creator</span>
                         </li>
                         <li class="flex items-start">
                             <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -290,7 +269,7 @@
                             <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
-                            <span>Community support</span>
+                            <span>10 questions per quizz</span>
                         </li>
                     </ul>
 
@@ -326,7 +305,7 @@
                             <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
-                            <span>Quiz Creator (Standard)</span>
+                            <span>50 Quiz Creations</span>
                         </li>
                         <li class="flex items-start">
                             <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -338,13 +317,13 @@
                             <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
-                            <span>Advanced statistics</span>
+                            <span>10 Summary Creations</span>
                         </li>
                         <li class="flex items-start">
                             <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
-                            <span>Priority email support</span>
+                            <span>20 questions per quiz</span>
                         </li>
                     </ul>
 
@@ -377,7 +356,7 @@
                             <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
-                            <span>Quiz Creator (Unlimited)</span>
+                            <span>150 Quiz Creator (Unlimited)</span>
                         </li>
                         <li class="flex items-start">
                             <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -389,7 +368,7 @@
                             <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
-                            <span>AI-powered analytics</span>
+                            <span>50 questions per quiz</span>
                         </li>
                         <li class="flex items-start">
                             <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -428,7 +407,7 @@
 <!-- Footer -->
 <footer class="bg-gray-800 text-white pt-12 pb-8">
     <div class="container mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
                 <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
                 <ul class="space-y-2">
@@ -474,16 +453,7 @@
                 </div>
             </div>
 
-            <div>
-                <h3 class="text-lg font-semibold mb-4">Newsletter</h3>
-                <p class="text-gray-300 mb-4">Subscribe to get updates on new features and promotions.</p>
-                <form class="flex">
-                    <input type="email" placeholder="Your email" class="px-4 py-2 w-full rounded-l-md focus:outline-none text-gray-800">
-                    <button type="submit" class="bg-primary hover:bg-blue-600 px-4 py-2 rounded-r-md transition-colors">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </form>
-            </div>
+
         </div>
 
         <div class="border-t border-gray-700 pt-8 mt-8 text-center text-gray-400">
