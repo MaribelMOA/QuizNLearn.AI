@@ -13,6 +13,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
+use App\Models\QuizQuestion;
+use App\Models\QuizAnswer;
+use App\Models\QuestionType;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
 
 
 class QuizController extends Controller
@@ -146,22 +153,57 @@ class QuizController extends Controller
     public function store(StoreQuizRequest $request)
     {
         $user = Auth::user();
-        $uses =UsageService::calculateAvailableUses($user->id);
-        // Estos valores vendrían de la suscripción del usuario o configuración
-//        $availableCreations = $uses['quiz_creation']['remaining']?? 4;
-//        if($availableCreations>0){
-//            return redirect()->route('quizzes.index')
-//                ->with('error', 'No tienes creaciones de cuestionarios disponibles.');
-//        }
+        //----------con esto FUNCIONO ORGINALMENTE
         $data = $request->validated(); // Obtiene solo los campos validados
 
         // Primero, guardamos el quiz con los datos proporcionados para mantener el registro
-        $quiz = Quiz::create($request->validated());
+        $data['user_id'] = Auth::id(); // Usando el ID del usuario autenticado
+       //----------
+//        $content = '';
+//
+//        if ($request->filled('topic')) {
+//            $content .= "Topic: " . $request->input('topic') . "\n\n";
+//        }
+//
+//        if ($request->hasFile('documents')) {
+//            foreach ($request->file('documents') as $pdf) {
+//                $text = $this->extractTextFromPDF($pdf);
+//                $content .= "\n\n--- PDF Content ---\n" . $text;
+//            }
+//        }
+//
+//        if ($request->filled('urls')) {
+//            $urls = explode("\n", $request->input('urls'));
+//            foreach ($urls as $url) {
+//                $text = $this->fetchTextFromURL(trim($url));
+//                $content .= "\n\n--- URL Content ---\n" . $text;
+//            }
+//        }
+//
+//        if ($request->filled('manual_text')) {
+//            $content .= "\n\n--- Manual Text ---\n" . $request->input('manual_text');
+//        }
+//
+//        $content = Str::limit($content, 4000); // Límite de caracteres para ahorrar tokens
+//
+//        // Crear quiz en base
+//        $quiz = Quiz::create([
+//            'title' => $request->input('topic') ?? 'Generated Quiz',
+//            'num_questions' => $validated['num_questions'],
+//            'difficulty_level' => $validated['difficulty_level'],
+//            'mode' => $validated['mode'],
+//            'user_id' => auth()->id(),
+//        ]);
+//
+//        // Redirigir a vista de espera mientras se procesa
+//        return view('quizzes.wait', compact('quiz', 'content'));
 
-        //AGREGAR LO DE REDUCIR USOOOOOOOOS
-       // DIGO, QUIZA NO SE OCUPE
+        //----con esto funciono
+        $quiz = Quiz::create($data);
+        return redirect()->route('quizzes.index')->with('success', 'Quiz creado exitosamente.');
+        //-----
         // Redirigir al usuario a la vista de espera
-        return redirect()->route('quizzes.wait', ['quiz' => $quiz->id]);
+       // return redirect()->route('quizzes.wait', ['quiz' => $quiz->id]);
     }
 
 

@@ -8,6 +8,7 @@ use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizQuestionController;
 use App\Http\Controllers\ArenaGameController;
 use App\Http\Controllers\SummaryController;
+use App\Http\Controllers\UrlValidationController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -30,7 +31,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('summaries', SummaryController::class);
     Route::resource('arena', ArenaGameController::class);
 
-   // Route::get('/play', [QuizController::class, 'play'])->name('features.index');
+    Route::post('/validate-url', [UrlValidationController::class, 'validate']);
+
+
+    // Route::get('/play', [QuizController::class, 'play'])->name('features.index');
 
     //Route::resource('quiz-questions', QuizQuestionController::class);
     //Route::resource('quiz-answers', QuizAnswerController::class);

@@ -46,20 +46,20 @@ class StoreQuizRequest extends FormRequest
         ];
     }
 
-    public function withValidator($validator)
-    {
-        $validator->after(function ($validator) {
-            $hasSource = $this->hasFile('pdfs') || $this->filled('urls') || $this->filled('manual_text');
-            $hasTopic  = $this->filled('topic');
-
-            if ($hasSource && $hasTopic) {
-                $validator->errors()->add('topic', "You cant enter a topic if you've chosen a source.");
-            }
-
-            if (!$hasSource && !$hasTopic) {
-                $validator->errors()->add('topic', 'You must wirte a topic or provide a source');
-            }
-        });
-    }
+//    public function withValidator($validator)
+//    {
+//        $validator->after(function ($validator) {
+//            $hasSource = $this->hasFile('pdfs') || $this->filled('urls') || $this->filled('manual_text');
+//            $hasTopic  = $this->filled('topic');
+//
+//            if ($hasSource && $hasTopic) {
+//                $validator->errors()->add('topic', "You cant enter a topic if you've chosen a source.");
+//            }
+//
+//            if (!$hasSource && !$hasTopic) {
+//                $validator->errors()->add('topic', 'You must wirte a topic or provide a source');
+//            }
+//        });
+//    }
 
 }
