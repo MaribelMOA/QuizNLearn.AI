@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Controllers\UserPlanController;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class StoreQuizRequest extends FormRequest
 {
@@ -22,12 +24,15 @@ class StoreQuizRequest extends FormRequest
     public function rules(): array
     {
         $user = auth()->user(); // Obtener el usuario autenticado.
+        // Obtener el plan del usuario
+        $userPlan = $user->userPlan; // Esto devolverá el único UserPlan asociado
 
-        // Obtener el número máximo de preguntas basado en el plan del usuario.
-        $maxQuestions = $user->plan ? $user->plan->max_questions : 10; // Valor por defecto es 10 si no hay plan asociado.
-        $maxPdfs = $user->plan ? $user->plan->pdf_files : 1; // Definir un valor por defecto si no se encuentra el plan
-        $maxUrls = $user->plan ? $user->plan->urls : 1; // Definir un valor por defecto si no se encuentra el plan
-        $maxTextLimit = $user->plan ? $user->plan->text_limit : 0;
+// Si no existe un plan asociado, puedes utilizar valores por defecto
+        $maxUrls = $userPlan ? $userPlan->plan->urls : 1;
+        $maxQuestions = $userPlan ? $userPlan->plan->max_questions : 10;
+        $maxPdfs = $userPlan ? $userPlan->plan->pdf_files : 1;
+        $maxTextLimit = $userPlan ? $userPlan->plan->text_limit : 0;
+
 
         return [
             'title' => 'required|string|max:150',
@@ -40,8 +45,10 @@ class StoreQuizRequest extends FormRequest
             'urls.*' => ['nullable', 'url'], // Validación de URLs individuales
             'manual_text' => ['nullable', 'string', 'max:' . $maxTextLimit],
             'topic' => ['nullable', 'string', 'max:255'],
+            'question_types' => ['required', 'array'],
+            'question_types.*' =>  ['in:multiple_choice,true_false,open_ended'],
 
-           // 'quiz_data' => 'required|json', // El campo quiz_data debe ser un JSON válido
+            // 'quiz_data' => 'required|json', // El campo quiz_data debe ser un JSON válido
 
         ];
     }

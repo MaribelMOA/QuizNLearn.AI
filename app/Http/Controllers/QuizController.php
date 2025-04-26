@@ -13,11 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-use App\Models\QuizQuestion;
-use App\Models\QuizAnswer;
-use App\Models\QuestionType;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
+use App\Services\QuizGenerationService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 
@@ -154,57 +151,122 @@ class QuizController extends Controller
     {
         $user = Auth::user();
         //----------con esto FUNCIONO ORGINALMENTE
-        $data = $request->validated(); // Obtiene solo los campos validados
+        //$data = $request->validated(); // Obtiene solo los campos validados
 
         // Primero, guardamos el quiz con los datos proporcionados para mantener el registro
-        $data['user_id'] = Auth::id(); // Usando el ID del usuario autenticado
+       // $data['user_id'] = Auth::id(); // Usando el ID del usuario autenticado
        //----------
-//        $content = '';
-//
-//        if ($request->filled('topic')) {
-//            $content .= "Topic: " . $request->input('topic') . "\n\n";
-//        }
-//
-//        if ($request->hasFile('documents')) {
-//            foreach ($request->file('documents') as $pdf) {
-//                $text = $this->extractTextFromPDF($pdf);
-//                $content .= "\n\n--- PDF Content ---\n" . $text;
-//            }
-//        }
-//
-//        if ($request->filled('urls')) {
-//            $urls = explode("\n", $request->input('urls'));
-//            foreach ($urls as $url) {
-//                $text = $this->fetchTextFromURL(trim($url));
-//                $content .= "\n\n--- URL Content ---\n" . $text;
-//            }
-//        }
-//
-//        if ($request->filled('manual_text')) {
-//            $content .= "\n\n--- Manual Text ---\n" . $request->input('manual_text');
-//        }
-//
-//        $content = Str::limit($content, 4000); // Límite de caracteres para ahorrar tokens
-//
-//        // Crear quiz en base
-//        $quiz = Quiz::create([
-//            'title' => $request->input('topic') ?? 'Generated Quiz',
-//            'num_questions' => $validated['num_questions'],
-//            'difficulty_level' => $validated['difficulty_level'],
-//            'mode' => $validated['mode'],
-//            'user_id' => auth()->id(),
-//        ]);
-//
-//        // Redirigir a vista de espera mientras se procesa
-//        return view('quizzes.wait', compact('quiz', 'content'));
+        $validated = $request->validated();
+        $content = '';
+
+        if ($request->filled('topic')) {
+            $content .= "Topic: " . $request->input('topic') . "\n\n";
+        }
+
+        if ($request->hasFile('pdfs')) {
+            Log::info("PDFs received: " . json_encode($request->file('pdfs')));
+
+            foreach ($request->file('pdfs') as $pdf) {
+                $text = QuizGenerationService::extractTextFromPDF($pdf);
+                Log::info("Extracted text from PDF: " . $text);  // Ver lo que se extrajo
+
+                if (!empty($text)) {
+                    $content .= "\n\n--- PDF Content ---\n" . $text;
+                } else {
+                    Log::warning("No text extracted from PDF.");
+                }
+            }
+        }
+
+        if ($request->filled('urls')) {
+           // $urls = explode("\n", $request->input('urls'));
+            foreach ($request->input('urls') as $url) {
+                $text = QuizGenerationService::fetchTextFromURL(trim($url));
+                // Eliminar elementos no deseados como JavaScript, etiquetas innecesarias, etc.
+                $text = strip_tags($text);  // Eliminar etiquetas HTML
+                $text = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $text); // Eliminar JavaScript
+
+                if (!empty($text)) {
+                    $content .= "\n\n--- URL Content ---\n" . $text;
+                } else {
+                    Log::warning("No content extracted from URL: $url");
+                }
+            }
+        }
+
+        if ($request->filled('manual_text')) {
+            $content .= "\n\n--- Manual Text ---\n" . $request->input('manual_text');
+        }
+
+      //  $content = Str::limit($content, 4000); // Límite de caracteres para ahorrar tokens
+
+        // Crear quiz en base
+        $quiz = Quiz::create([
+            'title' => $request->input('topic') ?? 'Generated Quiz',
+            'num_questions' => $validated['num_questions'],
+            'difficulty_level' => $validated['difficulty_level'],
+            'mode' => $validated['mode'],
+            'user_id' => auth()->id(),
+        ]);
+
+        Log::info("Content ->" .$content);
+        if (is_null($content) || trim($content) === '') {
+            Log::error("generateWithGemini: Content is empty or null");
+            throw new \InvalidArgumentException('No content provided for quiz generation.');
+        }
+
+
+
+        session(['quiz_content' => $content,
+            'quiz_question_types' =>  $request->input('question_types', [])]);
+
+        // Redirigir a vista de espera mientras se procesa
+        return view('quizzes.wait', compact('quiz'));
 
         //----con esto funciono
-        $quiz = Quiz::create($data);
-        return redirect()->route('quizzes.index')->with('success', 'Quiz creado exitosamente.');
+//        $quiz = Quiz::create($data);
+//        return redirect()->route('quizzes.index')->with('success', 'Quiz creado exitosamente.');
         //-----
         // Redirigir al usuario a la vista de espera
        // return redirect()->route('quizzes.wait', ['quiz' => $quiz->id]);
     }
+
+    public function process(Request $request, Quiz $quiz)
+    {
+       // $content = $request->input('content');
+        $content = session('quiz_content');
+        $questionTypes = session('quiz_question_types', []);
+
+
+        if (is_null($content) || trim($content) === '') {
+            Log::error("No content found for quiz generation (session).");
+            return response()->json(['status' => 'error', 'message' => 'No content available for generation.'], 400);
+        }
+
+        if (empty($questionTypes)) {
+            Log::error("Missing question types in session");
+            throw new \Exception('No question types provided for distribution.');
+        }
+
+
+        // Si el contenido es muy largo, resumir con Hugging Face
+        if (strlen($content) > 3000) {
+            $content = QuizGenerationService::summarizeContent($content);
+        }
+
+        // Llama al generador según config
+       // $aiProvider = config('services.ai.provider', 'openai');
+//        $questions = $aiProvider === 'gemini'
+//            ? QuizGenerationService::generateWithGemini($content, $quiz)
+//            : QuizGenerationService::generateWithOpenAI($content, $quiz);
+        $questions =QuizGenerationService::generateWithGemini($content, $quiz,$questionTypes);
+        // Guardar en la base de datos
+        QuizGenerationService::storeGeneratedQuestions($questions, $quiz);
+
+        return response()->json(['status' => 'ok', 'message' => 'Preguntas generadas y guardadas.']);
+    }
+
+
 
 
     /**

@@ -28,6 +28,9 @@ Route::middleware('auth')->group(function () {
     // Rutas para funcionalidades/tienda
     Route::get('/features', [FeatureController::class, 'index'])->name('features.index');
     Route::resource('quizzes', QuizController::class);
+    Route::post('/quizzes/{quiz}/process', [QuizController::class, 'process'])->name('quizzes.process');
+
+
     Route::resource('summaries', SummaryController::class);
     Route::resource('arena', ArenaGameController::class);
 

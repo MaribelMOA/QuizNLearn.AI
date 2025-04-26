@@ -13,9 +13,9 @@ class QuestionTypeSeeder extends Seeder
     public function run(): void
     {
         $types = [
-            'Multiple Choice',
-            'True or False',
-            'Open Questions',
+            'multiple_choice',
+            'true_false',
+            'open_ended',
         ];
 
         foreach ($types as $type) {

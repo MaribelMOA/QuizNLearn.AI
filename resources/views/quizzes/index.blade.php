@@ -467,6 +467,12 @@
             // Mostrar modal si hay errores de validación
             @if ($errors->any())
                 modal.classList.remove('hidden');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Error with submission',
+                    text: @json($errors->all()),
+                    confirmButtonColor: '#6366F1'
+                });
                 console.log("Erros: ",@json($errors->all()));
             @endif
 
