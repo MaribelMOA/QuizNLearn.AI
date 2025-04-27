@@ -414,7 +414,7 @@ EOT;
         $quiz->quiz_data = $text;
         $quiz->save();
 
-       // Log::info("Generated quiz: $text");
+        Log::info("Generated quiz: $text");
 
         return self::saveQuiz($text, $quiz, $questionTypes);
     }
@@ -433,7 +433,7 @@ EOT;
             return false;
         }
 
-      //  Log::info("Quiz generated and stored successfully.");
+        Log::info("Quiz generated and stored successfully.");
         return true;
     }
 
@@ -455,11 +455,11 @@ EOT;
         $allSaved = true;
 
         foreach ($questions as $questionData) {
-          //  Log::info("Processing question: " . $questionData['question_text']);
+            Log::info("Processing question: " . $questionData['question_text']);
 
             $questionTypeLabel = $questionData['question_type'];
             $mappedType = QuizGenerationService::mapLabelToQuestionType($questionTypeLabel);
-          //  Log::info("Mapped question type: " . $mappedType);
+            Log::info("Mapped question type: " . $mappedType);
 
             $type = QuestionType::where('name', $mappedType)->first();
 
@@ -481,7 +481,7 @@ EOT;
             }
 
             $quiz->questionTypes()->syncWithoutDetaching([$type->id]);
-          //  Log::info("Question saved: " . $question->question_text);
+           Log::info("Question saved: " . $question->question_text);
         }
 
         return $allSaved;
