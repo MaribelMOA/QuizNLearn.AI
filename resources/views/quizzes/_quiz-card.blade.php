@@ -92,23 +92,15 @@
                 </div>
             </div>
         </div>
-        @if($questionnaire->category)
-            <div class="mb-2">
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                    {{ $questionnaire->category }}
-                </span>
-            </div>
-        @endif
 
-        @if($questionnaire->description)
-            <p class="text-sm text-gray-600 line-clamp-2 mb-2">{{ $quiz->description }}</p>
-        @endif
     </div>
 
     <div class="p-2 border-t border-gray-200 mt-auto flex justify-between items-center">
-        <a href="{{ route('quizzes.show', $questionnaire) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+        <a href="{{ route('quizzes.details', $questionnaire) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
             View Details
         </a>
+
+
 
         <div class="flex items-center space-x-2">
 

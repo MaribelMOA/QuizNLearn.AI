@@ -260,7 +260,7 @@
 
 
 
-    <!-- Modal -->
+    <!-- Modal Create -->
     <div id="modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center hidden" >
         <div class="bg-white w-full max-w-3xl mx-auto sm:px-6 lg:px-8 p-6 rounded-lg shadow-lg relative">
 
@@ -419,9 +419,15 @@
         </div>
     </div>
 
+    <!--MODEAL VIEW DETAILS-->
+
+
+
+
 
     <!-- Incluir SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
 
     <script>
         // Clear search functionality
@@ -789,6 +795,7 @@
 
             return true;
         }
+
 
 
 

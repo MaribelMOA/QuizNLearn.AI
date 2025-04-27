@@ -30,6 +30,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/features', [FeatureController::class, 'index'])->name('features.index');
     Route::resource('quizzes', QuizController::class);
     Route::post('/quizzes/{quiz}/process', [QuizController::class, 'process'])->name('quizzes.process');
+    Route::get('/quizzes/{quiz}/details', [QuizController::class, 'details'])->name('quizzes.details');
+
+    Route::get('/download-quiz/{quiz_id}', [QuizController::class, 'downloadQuizAsPdf'])->name('quiz.downloadPdf');
 
 
     Route::resource('summaries', SummaryController::class);

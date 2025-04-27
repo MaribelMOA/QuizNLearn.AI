@@ -10,6 +10,7 @@ use App\Models\QuizCreation;
 use App\Models\Summary;
 use App\Models\UserPlan;
 use App\Services\UsageService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -20,6 +21,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Smalot\PdfParser\Parser;
 
+use Illuminate\Support\Facades\Response;
+//use Barryvdh\DomPDF\Facade as PDF;
 
 
 
@@ -286,6 +289,82 @@ class QuizController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Questions generated successfully.']);
     }
+
+    /**
+     * Display the specified quiz detaile
+     */
+    public function details(Quiz $quiz)
+    {
+        $user = Auth::user();
+        $uses =UsageService::calculateAvailableUses($user->id);
+        // Estos valores vendrían de la suscripción del usuario o configuración
+        $studyModeUses = $uses['study_mode']['remaining']?? 5;
+        $arenaModeUses = $uses['arena_mode']['remaining']?? 6;
+//        $studyModeUses = 0;
+//        $arenaModeUses = 0;
+        // Calcular timesUsed (Veces jugado)
+        $timesUsed = $quiz->gameHistories()->count();
+
+        // Si no se ha jugado ninguna vez, asignar valores por defecto
+        if ($timesUsed == 0) {
+            $lastPlayed = 'No se ha jugado aún';
+            $lastModePlayed = 'No se ha jugado aún';
+            $showPerformanceStats = false; // Ocultar performance statistics
+        } else {
+            // Calcular lastPlayed (Última vez jugado)
+            $lastPlayed = $quiz->gameHistories()->latest()->first()->created_at ?? null;
+
+            // Calcular lastModePlayed (Último modo jugado)
+            $lastModePlayed = $quiz->gameHistories()->latest()->first()->mode ?? null;
+
+            $showPerformanceStats = true; // Mostrar performance statistics
+        }
+
+        // Calcular avgScore (Promedio de puntajes)
+        $avgScore = $quiz->gameHistories()->whereNotNull('score')->avg('score');
+
+        // Calcular bestScore (Mejor puntaje)
+        $bestScore = $quiz->gameHistories()->whereNotNull('score')->max('score');
+
+        // Calcular worstScore (Peor puntaje)
+        $worstScore = $quiz->gameHistories()->whereNotNull('score')->min('score');
+
+        // Pasar los valores a la vista usando compact
+        return view('quizzes.modal', compact(
+            'quiz',          // Pasa el objeto quiz completo
+            'avgScore',      // Pasa el valor de avg_score calculado
+            'bestScore',     // Pasa el valor de best_score calculado
+            'worstScore',    // Pasa el valor de worst_score calculado
+            'timesUsed',     // Pasa el valor de times_used calculado
+            'lastPlayed',    // Pasa la fecha de la última vez jugado
+            'lastModePlayed',// Pasa el último modo jugado
+            'showPerformanceStats', // Indica si mostrar o no performance statistics
+            'studyModeUses',
+            'arenaModeUses',
+        ));
+    }
+
+    public function downloadQuizAsPdf($quiz_id)
+    {
+        // Obtener el quiz junto con las preguntas y respuestas
+        $quiz = Quiz::with(['quizQuestions.quizQuestionAnswers'])->findOrFail($quiz_id);
+
+        // Preparar los datos del quiz
+        $data = [
+            'quiz' => $quiz,
+            'questions' => $quiz->quizQuestions,
+        ];
+
+        // Generar el PDF usando los datos y pasarlos a la vista
+        $pdf = PDF::loadHTML(QuizGenerationService::generatePdfContent($data));
+
+        // Descargar el archivo PDF con el nombre del quiz
+        return $pdf->download('quiz_' . $quiz->title . '.pdf');
+    }
+
+
+
+
 
 
 

@@ -520,18 +520,67 @@ EOT;
     }
 
 
+    // Función para generar el contenido HTML del PDF
+    public static function generatePdfContent($data)
+    {
+        // Obtener los datos del quiz
+        $quiz = $data['quiz'];
 
+        // Obtener la fecha y hora actual
+        $date = now()->format('d/m/Y');
 
+        // Iniciar el contenido HTML para el PDF
+        $content = "
+    <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; }
+                .quiz-header { text-align: center; margin-bottom: 20px; }
+                .question { margin-bottom: 20px; }
+                .options { margin-left: 20px; }
+                .info-line { margin-top: 10px; text-align: left; }
+                .info-line p { display: inline-block; margin-right: 20px; }
 
+            </style>
+        </head>
+        <body>
+            <div class='quiz-header'>
+                <h1>Quiz: {$quiz->title}</h1>
+                <div class='info-line'>
+                    <p><strong>Name:</strong> ___________________________________</p>
+                    <p><strong>Date:</strong> {$date}</p>
+                    <p><strong>Score:</strong> ____ /  {$quiz->num_questions}    </p>
 
+                </div>
+                <p>Difficulty Level: {$quiz->difficulty_level}</p>
 
+                <p><strong>Instructions:</strong> Read each question carefully and answer accordingly.</p>
+            </div>";
 
+        // Generar preguntas y respuestas
+        foreach ($data['questions'] as $index => $question) {
+            $content .= "<div class='question'>
+                        <p><strong>Question " . ($index + 1) . ":</strong> {$question->question_text}</p>";
 
+            // Dependiendo del tipo de pregunta, mostrar las opciones
+            if ($question->type->name == 'multiple_choice' || $question->type->name == 'true_or_false') {
+                $content .= "<div class='options'>";
+                foreach ($question->quizQuestionAnswers as $key => $answer) {
+                    $content .= "<p>" . chr(65 + $key) . ". {$answer->answer_text}</p>";
+                }
+                $content .= "</div>";
+            } elseif ($question->type->name == 'open_question') {
+                $content .= "<p><em>Open-ended question</em></p>";
+            }
 
+            $content .= "</div>";
+        }
 
+        // Cerrar el contenido HTML
+        $content .= "</body></html>";
 
-
-
+        return $content;
+    }
 
 
 
