@@ -39,8 +39,8 @@ class StoreQuizRequest extends FormRequest
             'num_questions' => 'required|integer|min:1|max:' . $maxQuestions, // Validación dinámica.
             'difficulty_level' => 'required|in:Easy,Medium,Hard',
             'mode' => 'required|in:Quiz,Study,Arena',
-            'pdfs' => ['nullable', 'array', 'max:' . $maxPdfs], // Validación de cantidad de PDFs
-            'pdfs.*' => ['nullable', 'file', 'mimes:pdf', 'max:5120'], // 5MB por archivo
+            'pdf_file' => ['nullable', 'array', 'max:' . $maxPdfs], // Validación de cantidad de PDFs
+            'pdf_file.*' => ['nullable', 'mimes:pdf', 'max:5120'], // 5MB por archivo
             'urls' => ['nullable', 'array', 'max:' . $maxUrls], // Validación de cantidad de URLs
             'urls.*' => ['nullable', 'url'], // Validación de URLs individuales
             'manual_text' => ['nullable', 'string', 'max:' . $maxTextLimit],
@@ -52,6 +52,21 @@ class StoreQuizRequest extends FormRequest
 
         ];
     }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            if (
+                !$this->filled('manual_text') &&
+                !$this->hasFile('pdfs') &&
+                !$this->hasFile('topic') &&
+                empty($this->input('urls'))
+            ) {
+                $validator->errors()->add('content', 'You must provide at least one content source: PDF, URL, or manual text.');
+            }
+        });
+    }
+
 
 //    public function withValidator($validator)
 //    {

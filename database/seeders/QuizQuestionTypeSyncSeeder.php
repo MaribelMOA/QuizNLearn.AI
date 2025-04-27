@@ -30,7 +30,7 @@ class QuizQuestionTypeSyncSeeder extends Seeder
             if ($quiz && $quiz->mode === 'Arena') {
                 // Si es "Arena", evitar insertar "Open Questions"
                 // Verificar si la question_type_id es para "Open Question" (usualmente tiene un ID específico)
-                $openQuestionTypeId = QuestionType::where('name', 'Open Questions')->first()->id;
+                $openQuestionTypeId = QuestionType::where('name', 'open_question')->first()->id;
 
                 if ($combo->question_type_id === $openQuestionTypeId) {
                     // Si es una pregunta abierta, no hacer la inserción
@@ -39,7 +39,7 @@ class QuizQuestionTypeSyncSeeder extends Seeder
             }
 
             // Si no es Arena o la pregunta no es abierta, insertar o actualizar la relación
-            DB::table('quiz_question_type')->updateOrInsert(
+            DB::table('quiz_question_types')->updateOrInsert(
                 [
                     'quiz_id' => $combo->quiz_id,
                     'question_type_id' => $combo->question_type_id,

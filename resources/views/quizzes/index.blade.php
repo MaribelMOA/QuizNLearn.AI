@@ -322,7 +322,7 @@
                         <!-- PDF File Upload -->
                         <div class="mb-4">
                             <label for="pdf_file" class="block font-medium text-sm text-gray-700">PDF File</label>
-                            <input id="pdf_file" name="pdf_file" type="file" multiple accept="application/pdf" class="block mt-1 w-full text-sm text-gray-600" onchange="if(this.files.length > {{ $planLimits['pdf_files'] }}) { alert('Límite de PDFs alcanzado'); this.value=''; }">
+                            <input id="pdf_file" name="pdf_file[]" type="file" multiple accept="application/pdf" class="block mt-1 w-full text-sm text-gray-600" onchange="if(this.files.length > {{ $planLimits['pdf_files'] }}) { alert('Límite de PDFs alcanzado'); this.value=''; }">
                             @error('pdf_file') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 

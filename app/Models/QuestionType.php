@@ -17,12 +17,13 @@ class QuestionType extends Model
 
     public function quizzes()
     {
-        return $this->belongsToMany(Quiz::class, 'quiz_question_type');
+        return $this->belongsToMany(Quiz::class, 'quiz_question_types');
     }
     // app/Models/QuestionType.php
     public function questions()
     {
         return $this->hasMany(QuizQuestion::class);
     }
+
 
 }

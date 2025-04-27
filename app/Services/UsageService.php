@@ -42,12 +42,12 @@ class UsageService
             ],
             'quiz_creation' => [
                 'plan_column' => 'quizzes_allowed',
-                'usage_table' => 'quizzes',
+                'usage_table' => 'quiz_creations',
                 'usage_column' => 'user_id',
             ],
             'summary_creation' => [
                 'plan_column' => 'summaries_allowed',
-                'usage_table' => 'summaries',
+                'usage_table' => 'summary_creations',
                 'usage_column' => 'user_id',
             ],
         ];

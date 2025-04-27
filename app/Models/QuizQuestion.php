@@ -9,7 +9,7 @@ class QuizQuestion extends Model
 {
     /** @use HasFactory<\Database\Factories\QuizQuestionFactory> */
     use HasFactory;
-    protected $fillable = ['quiz_id', 'question_text'];
+    protected $fillable = ['quiz_id', 'question_type_id', 'question_text'];
 
     /**
      * Relación con el quiz al que pertenece la pregunta.
@@ -19,8 +19,9 @@ class QuizQuestion extends Model
         return $this->belongsTo(Quiz::class);
     }
 
-    public function quizQuestionAnswers(){
-        return $this->hasMany(QuizAnswer::class);
+    public function quizQuestionAnswers()
+    {
+        return $this->hasMany(QuizAnswer::class, 'question_id');
     }
 
     // app/Models/QuizQuestion.php

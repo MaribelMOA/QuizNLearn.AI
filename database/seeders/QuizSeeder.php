@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\QuizCreation;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
@@ -33,6 +34,13 @@ class QuizSeeder extends Seeder
                         'questions' => [],
                     ]),
                 ]);
+
+                QuizCreation::create([
+                    'user_id' => $user->id,
+                   // NO EXISTE ESTE ATRIBUTOS 'quiz_id' => $quiz->id, // (Si quieres guardar relación directa)
+                ]);
+
+
             }
         }
     }

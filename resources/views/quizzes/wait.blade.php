@@ -24,7 +24,17 @@
             }).then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        window.location.href = "{{ route('quizzes.show', $quiz->id) }}";
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Quiz created!',
+                            text: 'Congrats! You re quiz has been created.We will redirect you to your Quiz List',
+                            confirmButtonText: 'OK',
+                            didClose: () => {
+                                window.location.href = "{{ route('quizzes.index') }}";
+                            }
+                        });
+
+                        // window.location.href = "{{ route('quizzes.show', $quiz->id) }}";
                     } else {
                         // SweetAlert on error
                         Swal.fire({

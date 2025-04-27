@@ -6,6 +6,7 @@ use App\Http\Requests\StoreQuizRequest;
 use App\Http\Requests\UpdateQuizRequest;
 use App\Models\Quiz;
 use App\models\GameHistory;
+use App\Models\QuizCreation;
 use App\Models\Summary;
 use App\Models\UserPlan;
 use App\Services\UsageService;
@@ -16,6 +17,9 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Services\QuizGenerationService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use Smalot\PdfParser\Parser;
+
 
 
 
@@ -163,19 +167,22 @@ class QuizController extends Controller
             $content .= "Topic: " . $request->input('topic') . "\n\n";
         }
 
-        if ($request->hasFile('pdfs')) {
-            Log::info("PDFs received: " . json_encode($request->file('pdfs')));
+        if ($request->hasFile('pdf_file')) {
+            $parser = new Parser();
+            $pdfContents = [];
 
-            foreach ($request->file('pdfs') as $pdf) {
-                $text = QuizGenerationService::extractTextFromPDF($pdf);
-                Log::info("Extracted text from PDF: " . $text);  // Ver lo que se extrajo
-
+            // Recorrer todos los archivos PDF cargados
+            foreach ($request->file('pdf_file') as $pdf) {
+                $pdfContent = $parser->parseFile($pdf->getPathname()); // Extrae el contenido del archivo PDF
+                $text = $pdfContent->getText(); // Obtén el texto completo
                 if (!empty($text)) {
+                    // Concatenar el contenido a la variable $content
                     $content .= "\n\n--- PDF Content ---\n" . $text;
                 } else {
                     Log::warning("No text extracted from PDF.");
                 }
             }
+
         }
 
         if ($request->filled('urls')) {
@@ -202,20 +209,28 @@ class QuizController extends Controller
 
         // Crear quiz en base
         $quiz = Quiz::create([
-            'title' => $request->input('topic') ?? 'Generated Quiz',
+            'title' => $request->input('title') ?? 'Generated Quiz',
             'num_questions' => $validated['num_questions'],
             'difficulty_level' => $validated['difficulty_level'],
             'mode' => $validated['mode'],
             'user_id' => auth()->id(),
+            'created_at' => now(),
         ]);
 
-        Log::info("Content ->" .$content);
+        QuizCreation::create([
+            'user_id' =>  auth()->id(),
+        ]);
+
+        //  Log::info("Content before cleaning ->" . $content);
+
+// LIMPIEZA FINAL
+        $content = QuizGenerationService::cleanContent($content);
+        Log::info("Content after cleaning ->" . $content);
+
         if (is_null($content) || trim($content) === '') {
             Log::error("generateWithGemini: Content is empty or null");
             throw new \InvalidArgumentException('No content provided for quiz generation.');
         }
-
-
 
         session(['quiz_content' => $content,
             'quiz_question_types' =>  $request->input('question_types', [])]);
@@ -250,8 +265,11 @@ class QuizController extends Controller
 
 
         // Si el contenido es muy largo, resumir con Hugging Face
-        if (strlen($content) > 3000) {
-            $content = QuizGenerationService::summarizeContent($content);
+        $maxLength = 10000; // límite de caracteres
+        if (strlen($content) > $maxLength) {
+            Log::info("Maximum length exceeded for quiz generation.");
+            $content = QuizGenerationService::summarizeWithGemini($content);
+            Log::info("Summarized content:".$content);
         }
 
         // Llama al generador según config
@@ -259,12 +277,17 @@ class QuizController extends Controller
 //        $questions = $aiProvider === 'gemini'
 //            ? QuizGenerationService::generateWithGemini($content, $quiz)
 //            : QuizGenerationService::generateWithOpenAI($content, $quiz);
-        $questions =QuizGenerationService::generateWithGemini($content, $quiz,$questionTypes);
-        // Guardar en la base de datos
-        QuizGenerationService::storeGeneratedQuestions($questions, $quiz);
+        $success = QuizGenerationService::generateWithGemini($content, $quiz, $questionTypes);
 
-        return response()->json(['status' => 'ok', 'message' => 'Preguntas generadas y guardadas.']);
+        if (!$success) {
+            Log::error("Failed to generate and store quiz properly.");
+            return response()->json(['success' => false, 'message' => 'Error generating and saving the quiz.'], 500);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Questions generated successfully.']);
     }
+
+
 
 
 

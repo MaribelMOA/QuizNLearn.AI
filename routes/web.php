@@ -14,6 +14,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -37,7 +38,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/validate-url', [UrlValidationController::class, 'validate']);
 
 
-    // Route::get('/play', [QuizController::class, 'play'])->name('features.index');
+   // Route::get('/play', [QuizController::class, 'play'])->name('features.index');
 
     //Route::resource('quiz-questions', QuizQuestionController::class);
     //Route::resource('quiz-answers', QuizAnswerController::class);

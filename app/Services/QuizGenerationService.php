@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+use Smalot\PdfParser\Parser;
+use Illuminate\Support\Facades\Log;
+
+
 use Illuminate\Support\Facades\DB;
 class QuizGenerationService
 {
@@ -20,7 +24,7 @@ class QuizGenerationService
         $prompt = [
             [
                 'role' => 'user',
-                'content' => "Based on the following content, generate {$quiz->num_questions} quiz questions in JSON format, using only the following types: 1) Multiple Choice, 2) True or False, 3) Open Questions. For each question, include: type, text, options (if applicable), correct answer, and explanation.\n\nContent:\n" . $request->input('content')
+                'content' => "Based on the following content, generate {$quiz->num_questions} quiz questions in JSON format, using only the following types: 1) Multiple Choice, 2) True or False, 3) Open Question. For each question, include: type, text, options (if applicable), correct answer, and explanation.\n\nContent:\n" . $request->input('content')
             ]
         ];
 
@@ -75,7 +79,7 @@ class QuizGenerationService
                         'explanation' => ($value == $item['correct_answer']) ? $item['explanation'] : null,
                     ]);
                 }
-            } elseif ($item['type'] === 'Open Questions') {
+            } elseif ($item['type'] === 'Open Question') {
                 QuizAnswer::create([
                     'question_id' => $question->id,
                     'answer_text' => '[Open-ended]',
@@ -89,14 +93,6 @@ class QuizGenerationService
     }
 
     public static function extractTextFromPDF2($file)
-    {
-        $path = $file->storeAs('temp_pdfs', Str::uuid() . '.pdf');
-        $fullPath = storage_path('app/' . $path);
-        $text = shell_exec("pdftotext '$fullPath' -");
-        Storage::delete($path);
-        return $text ?? '';
-    }
-    public static function extractTextFromPDF($file)
     {
         // Guardar el PDF en el almacenamiento temporal
         $path = $file->storeAs('temp_pdfs', Str::uuid() . '.pdf');
@@ -119,6 +115,10 @@ class QuizGenerationService
 
     public static function fetchTextFromURL($url)
     {
+
+        if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
+            return '';
+        }
         $html = @file_get_contents($url);
         if (!$html) return '';
 
@@ -148,33 +148,123 @@ class QuizGenerationService
 //        }
     }
 
-    public static function summarizeContent(string $content): string
+//    public static function summarizeContent(string $content): string
+//    {
+//        $response = Http::withHeaders([
+//            'Authorization' => 'Bearer ' . config('services.huggingface.key'),
+//        ])->post('https://api-inference.huggingface.co/models/facebook/bart-large-cnn', [
+//            'inputs' => $content,
+//        ]);
+//
+//        if ($response->successful() && isset($response[0]['summary_text'])) {
+//            return $response[0]['summary_text'];
+//        }
+//
+//        return $content;
+//    }
+
+// Función para limpiar caracteres ilegales
+    public static function cleanContent($text)
     {
+        // Forzar UTF-8 correcto
+        $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
+
+        // Reemplazar caracteres ilegales (�) por un espacio
+        $text = str_replace('�', ' ', $text);
+
+        // También eliminar cualquier cosa fuera del rango UTF-8 básico
+        $text = preg_replace('/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/u', '', $text);
+
+        // Opcional: limpiar múltiples espacios
+        $text = preg_replace('/\s+/', ' ', $text);
+
+        return trim($text);
+    }
+
+
+    public static function summarizeContent(string $text): string
+    {
+        $apiKey = config('services.huggingface.key'); // Pon tu API KEY en tu .env
+        $endpoint = 'https://api-inference.huggingface.co/models/facebook/bart-large-cnn'; // Modelo de resumen
+
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . config('services.huggingface.key'),
-        ])->post('https://api-inference.huggingface.co/models/facebook/bart-large-cnn', [
-            'inputs' => $content,
+            'Authorization' => "Bearer $apiKey",
+        ])->post($endpoint, [
+            'inputs' => $text,
         ]);
 
-        if ($response->successful() && isset($response[0]['summary_text'])) {
-            return $response[0]['summary_text'];
+        if ($response->successful()) {
+            $result = $response->json();
+            return $result[0]['summary_text'] ?? $text; // Regresar el resumen
         }
 
-        return $content;
+        // Si falla, devolver el texto original
+        Log::error('Failed to summarize content: ' . $response->body());
+        return $text;
     }
-
-
-    public static function generateQuestions(string $content, Quiz $quiz)
+    public static function  summarizeWithGemini(string $text): ?string
     {
+        $apiKey = config('services.gemini.key');
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=$apiKey";
 
+        $postData = [
+            "contents" => [
+                [
+                    "parts" => [
+                        [
+                            "text" => "Summarize the following text preserving all main ideas for quiz generation.Limit the summary to a maximum of 5000 characters.\n\n$text"
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+        ]);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
+
+        $response = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            Log::error('Curl error: ' . curl_error($ch));
+            return null;
+        }
+
+        curl_close($ch);
+
+        $data = json_decode($response, true);
+
+        if (!isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+            Log::error('Unexpected API response: ' . $response);
+            return null;
+        }
+
+        return $data['candidates'][0]['content']['parts'][0]['text'];
     }
+
+
+
+
     public static function mapQuestionTypeLabel(string $type): string
     {
         return match ($type) {
             'multiple_choice' => 'Multiple Choice',
-            'true_false' => 'True or False',
-            'open_ended' => 'Open Question',
+            'true_or_false' => 'True or False',
+            'open_question' => 'Open Question',
             default => ucfirst(str_replace('_', ' ', $type)), // fallback decente
+        };
+    }
+    public static function mapLabelToQuestionType(string $label): string
+    {
+        return match (strtolower($label)) {
+            'Multiple Choice' => 'multiple_choice',
+            'true_or_false' => 'true_false',
+            'Open Question' => 'open_question',
+            default => strtolower(str_replace(' ', '_', $label)), // fallback para otros casos
         };
     }
 
@@ -200,7 +290,7 @@ class QuizGenerationService
         return $distribution; // ['Multiple Choice' => 3, 'True or False' => 2, ...]
     }
 
-    protected static function buildPrompt(string $content, Quiz $quiz,array $questionTypes): string
+    public static function buildPrompt(string $content, Quiz $quiz,array $questionTypes): string
     {
         $distribution = self::getQuestionTypeDistribution($quiz,$questionTypes);
 
@@ -219,17 +309,24 @@ For each question, respond in JSON format with this structure:
 
 {
   "question_text": "The question text",
-  "question_type": "Multiple Choice | True or False | Open Questions",
+  "question_type": "Multiple Choice | True or False | Open Question",
   "answers": [
     {
       "answer_text": "The answer text",
       "is_correct": true | false,
-      "explanation": "Explanation of why it is correct or incorrect"
+      "explanation": "Explanation of why it is correct or incorrect(maximum 150 characters)"
     }
   ]
 }
+Special instructions for "True or False" questions:
+- ALWAYS include exactly two answers: one with "True" and one with "False".
+- Specify clearly which one is correct (is_correct: true) and which one is incorrect (is_correct: false).
+- Provide an explanation for both answers (each explanation must be concise and up to 150 characters).
 
-Generate the entire JSON as an array. DO NOT explain anything outside the JSON.
+Generate the entire JSON as an array. Please make sure the explanations are concise and no longer than 150 characters.
+DO NOT explain anything outside the JSON.
+
+
 
 EOT;
 
@@ -265,55 +362,174 @@ EOT;
 
     public static function generateWithGemini(string $content, Quiz $quiz,  array $questionTypes)
     {
+        $apiKey = config('services.gemini.key');
+        $url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=$apiKey";
+
         $prompt = self::buildPrompt($content, $quiz, $questionTypes);
-        $apiKey = config('services.gemini_key');
 
-        $client = new \GuzzleHttp\Client();
-        $response = $client->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=$apiKey", [
-            'json' => [
-                'contents' => [[
-                    'parts' => [[ 'text' => $prompt ]]
-                ]]
+        $postData = [
+            "contents" => [
+                [
+                    "parts" => [
+                        [
+                            "text" => $prompt
+                        ]
+                    ]
+                ]
             ]
+        ];
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
         ]);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
 
-        $result = json_decode($response->getBody(), true);
-        $text = $result['candidates'][0]['content']['parts'][0]['text'] ?? '[]';
+        $response = curl_exec($ch);
 
-        return json_decode($text, true);
+        if (curl_errno($ch)) {
+            Log::error('Curl error during quiz generation: ' . curl_error($ch));
+            curl_close($ch);
+            return null;
+        }
+
+        curl_close($ch);
+
+        $data = json_decode($response, true);
+
+        if (!isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+            Log::error('Unexpected Gemini API response during quiz generation: ' . $response);
+            return null;
+        }
+
+        $text = $data['candidates'][0]['content']['parts'][0]['text'];
+        // ✅ Limpiar las comillas triples y la palabra "json"
+        $text = preg_replace('/^```json|```$/m', '', trim($text));
+        $text = trim($text); // Quitar espacios en blanco sobrantes
+
+
+        // Guardar directamente el texto en el campo quiz_data
+        $quiz->quiz_data = $text;
+        $quiz->save();
+
+       // Log::info("Generated quiz: $text");
+
+        return self::saveQuiz($text, $quiz, $questionTypes);
+    }
+    public static function saveQuiz(string $text, $quiz, $questionTypes)
+    {
+        // Decodificar las preguntas
+        $questions = self::decodeQuestions($text);
+        if (!$questions) {
+            return null; // Si las preguntas no se generaron correctamente, salir
+        }
+
+        $questionsSaved = self::saveQuestions($quiz, $questions, $questionTypes);
+        $answersSaved = self::saveAnswers($quiz, $questions);
+
+        if (!$questionsSaved || !$answersSaved) {
+            return false;
+        }
+
+      //  Log::info("Quiz generated and stored successfully.");
+        return true;
     }
 
-    public static function storeGeneratedQuestions(array $questions, Quiz $quiz): void
+    public static function decodeQuestions($text)
     {
-        DB::transaction(function () use ($questions, $quiz) {
-            foreach ($questions as $item) {
-                // Buscar el tipo
-                $type = QuestionType::where('name', $item['question_type'])->firstOrFail();
+        // Decodificar el JSON y preparar las preguntas para guardarlas
+        $questions = json_decode($text, true);
 
-                // Guardar la relación quiz - tipo si no existe
-                $quiz->questionTypes()->syncWithoutDetaching([$type->id]);
+        if (empty($questions)) {
+            Log::error('No questions generated or invalid format.');
+            return null;
+        }
 
-                // Crear la pregunta
-                $question = QuizQuestion::create([
-                    'quiz_id' => $quiz->id,
-                    'question_type_id' => $type->id,
-                    'question_text' => $item['question_text'],
+        return $questions;
+    }
+
+    public static function saveQuestions($quiz, $questions, $questionTypes)
+    {
+        $allSaved = true;
+
+        foreach ($questions as $questionData) {
+          //  Log::info("Processing question: " . $questionData['question_text']);
+
+            $questionTypeLabel = $questionData['question_type'];
+            $mappedType = QuizGenerationService::mapLabelToQuestionType($questionTypeLabel);
+          //  Log::info("Mapped question type: " . $mappedType);
+
+            $type = QuestionType::where('name', $mappedType)->first();
+
+            if (!$type) {
+                Log::error("Question type not found: " . $mappedType);
+                $allSaved = false;
+                continue;
+            }
+
+            $question = $quiz->quizQuestions()->create([
+                'question_text' => $questionData['question_text'],
+                'question_type_id' => $type->id
+            ]);
+
+            if (!$question) {
+                Log::error("Failed to save question: " . $questionData['question_text']);
+                $allSaved = false;
+                continue;
+            }
+
+            $quiz->questionTypes()->syncWithoutDetaching([$type->id]);
+          //  Log::info("Question saved: " . $question->question_text);
+        }
+
+        return $allSaved;
+    }
+
+
+
+
+    public static function saveAnswers($quiz, $questions)
+    {
+        $allSaved = true;
+
+        foreach ($questions as $questionData) {
+            $question = $quiz->quizQuestions()->where('question_text', $questionData['question_text'])->first();
+            if (!$question) {
+                Log::error("Question not found: " . $questionData['question_text']);
+                $allSaved = false;
+                continue;
+            }
+
+            foreach ($questionData['answers'] as $answerData) {
+                $answer = $question->quizQuestionAnswers()->create([
+                    'answer_text' => $answerData['answer_text'],
+                    'is_correct' => $answerData['is_correct'],
+                    'explanation' => $answerData['explanation'] ?? null,
                 ]);
 
-                // Si hay respuestas (solo en Multiple Choice o True/False)
-                if (!empty($item['answers']) && is_array($item['answers'])) {
-                    foreach ($item['answers'] as $answerData) {
-                        QuizAnswer::create([
-                            'question_id' => $question->id,
-                            'answer_text' => $answerData['answer_text'],
-                            'is_correct' => $answerData['is_correct'],
-                            'explanation' => $answerData['explanation'] ?? null,
-                        ]);
-                    }
+                if (!$answer) {
+                    Log::error("Failed to save answer for question: " . $question->question_text);
+                    $allSaved = false;
                 }
             }
-        });
+        }
+
+        return $allSaved;
     }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

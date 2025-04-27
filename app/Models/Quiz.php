@@ -34,7 +34,7 @@ class Quiz extends Model
     // app/Models/Quiz.php
     public function questionTypes(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(QuestionType::class, 'quiz_question_type');
+        return $this->belongsToMany(QuestionType::class, 'quiz_question_types');
     }
 
     /**
