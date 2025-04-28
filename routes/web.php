@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GameHistoryController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FeatureController;
@@ -41,7 +42,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/validate-url', [UrlValidationController::class, 'validate']);
 
 
-   // Route::get('/play', [QuizController::class, 'play'])->name('features.index');
+    /////PLAY MODES
+    Route::get('/quizzes/play/{questionnaire}', [GameHistoryController::class, 'play'])->name('quizzes.play');
+    // En routes/web.php
+    Route::post('/quizzes/submit-quiz-mode/{questionnaire}', [GameHistoryController::class, 'submitQuizMode'])->name('quizzes.submitQuizMode');
+    Route::get('/quizzes/results', [GameHistoryController::class, 'showQuizResults'])->name('quizzes.showQuizResults');
+
+    //Route::get('/play', [QuizController::class, 'play'])->name('features.index');
 
     //Route::resource('quiz-questions', QuizQuestionController::class);
     //Route::resource('quiz-answers', QuizAnswerController::class);

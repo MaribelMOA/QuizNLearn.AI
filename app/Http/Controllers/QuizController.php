@@ -82,7 +82,7 @@ class QuizController extends Controller
         // Agregar la verificación de preguntas abiertas para cada cuestionario
         foreach ($questionnaires as $quiz) {
             $quiz->hasOpenQuestions = $quiz->questionTypes->contains(function($type) {
-                return $type->name === 'Open Questions';  // Cambia 'Open' al nombre adecuado de tu tipo de pregunta
+                return $type->name === 'open_question';  // Cambia 'Open' al nombre adecuado de tu tipo de pregunta
             });
         }
 
@@ -424,40 +424,49 @@ class QuizController extends Controller
     }
 
 
-    public function play(Quiz $questionnaire, $mode)
+    public function play(Quiz $questionnaire, Request $request)
     {
-        $this->authorize('play', $questionnaire);
+        $mode = $request->query('mode'); // Obtener 'mode' de la query string
 
         $user = Auth::user();
-        $uses =UsageService::calculateAvailableUses($user->id);
+        $uses = UsageService::calculateAvailableUses($user->id);
 
-        $studyModeUses = $uses['study_mode']['remaining']?? 5;
-        $arenaModeUses = $uses['arena_mode']['remaining']?? 6;
-
+        $studyModeUses = $uses['study_mode']['remaining'] ?? 5;
+        $arenaModeUses = $uses['arena_mode']['remaining'] ?? 6;
 
         // Verificar si el usuario tiene usos disponibles para el modo seleccionado
-        if ($mode === 'study' && ($studyModeUses) <= 0) {
-            return redirect()->route('questionnaires.show', $questionnaire)
+        if ($mode === 'Study' && $studyModeUses <= 0) {
+            return redirect()->route('quizzes.index')
                 ->with('error', 'No tienes usos de Modo Estudio disponibles.');
         }
 
-        if ($mode === 'arena' && ($arenaModeUses) <= 0) {
-            return redirect()->route('quizzes.show', $questionnaire)
+        if ($mode === 'Arena' && $arenaModeUses <= 0) {
+            return redirect()->route('quizzes.index')
                 ->with('error', 'No tienes usos de Modo Arena disponibles.');
         }
 
-        // ESTO ESTA MAL
-        $questionnaire->load('quizQuestions.quizAnswers');
+        // Cargar las relaciones necesarias
+        $questionnaire->load('quizQuestions.quizQuestionAnswers', 'quizQuestions.type');
 
-        // Reducir el contador de usos disponibles según el modo
-//        if ($user->subscription) {
-//            if ($mode === 'study') {
-//                $user->subscription->decrement('remaining_study_uses');
-//            } elseif ($mode === 'arena') {
-//                $user->subscription->decrement('remaining_arena_uses');
-//            }
-//        }
+        if ($mode === 'Quiz') {
+//            return view('layouts.play', [
+//                'quiz' => $questionnaire,
+//                'questions' => $questionnaire->quizQuestions,
+//                'answeredQuestions' => 0,
+//                'totalQuestions' => $questionnaire->num_questions,
+//                'mode' => $mode,
+//            ]);
+            return view('quizzes.quiz-play', [
+                'quiz' => $questionnaire,
+                'questions' => $questionnaire->quizQuestions,
+                'answeredQuestions' => 0,
+                'totalQuestions' => $questionnaire->num_questions,
+                'mode' => $mode,
+            ]);
+        }
 
-        return view('quizzes.play', compact('questionnaire', 'mode'));
+        // Si llega un modo desconocido
+        return redirect()->route('quizzes.index')
+            ->with('error', 'Modo de juego no válido.');
     }
 }

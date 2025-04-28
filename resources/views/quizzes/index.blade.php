@@ -240,7 +240,7 @@
         </div>
     </div>
     <!-- Arena Mode Sidebar -->
-    <div class="fixed right-0 top-0 h-full w-80 bg-white shadow-lg transform transition-transform duration-300 ease-in-out"
+    <div class="fixed  right-0 top-0 h-full w-80 bg-white shadow-lg transform transition-transform duration-300 ease-in-out"
          x-data="{ open: false }"
          :class="{'translate-x-0': open, 'translate-x-full': !open}">
 
@@ -398,7 +398,7 @@
                         <div class="flex flex-col space-y-2 mt-1">
                             <label><input type="checkbox" name="question_types[]" value="multiple_choice"> Multiple Choice</label>
                             <label><input type="checkbox" name="question_types[]" value="true_false"> True/False</label>
-                            <label><input type="checkbox" name="question_types[]" value="open_ended" id="open_ended_checkbox"> Open-ended</label>
+                            <label><input type="checkbox" name="question_types[]" value="open_question" id="open_ended_checkbox"> Open-ended</label>
                             <p id="open_ended_warning" class="text-xs text-red-500 hidden">Open-ended questions are not allowed in Arena mode.</p>
                         </div>
                         @error('question_types[]')
@@ -703,7 +703,7 @@
         {{--});--}}
         document.addEventListener('DOMContentLoaded', function () {
             const defaultMode = document.getElementById('mode');
-            const openEndedCheckbox = document.querySelector('input[name="question_types[]"][value="open_ended"]');
+            const openEndedCheckbox = document.querySelector('input[name="question_types[]"][value="open_question"]');
 
             // Reaccionar al cambio del Default Mode
             defaultMode.addEventListener('change', function () {
@@ -744,7 +744,7 @@
 
             // Validación: Arena + Open Ended no permitido
             const selectedDefaultMode = defaultMode.value;
-            const hasOpenEnded = Array.from(questionTypes).some(q => q.value === 'open_ended');
+            const hasOpenEnded = Array.from(questionTypes).some(q => q.value === 'open_question');
 
             if (selectedDefaultMode === 'Arena' && hasOpenEnded) {
                 Swal.fire({

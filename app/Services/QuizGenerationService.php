@@ -205,7 +205,7 @@ class QuizGenerationService
     public static function  summarizeWithGemini(string $text): ?string
     {
         $apiKey = config('services.gemini.key');
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=$apiKey";
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey";
 
         $postData = [
             "contents" => [
@@ -269,11 +269,18 @@ class QuizGenerationService
     }
 
 
-    protected static function getQuestionTypeDistribution(Quiz $quiz,array $questionTypes)
+
+    public static function getQuestionTypeDistribution(Quiz $quiz, array $questionTypes)
     {
-        $types = $quiz->questionTypes()->pluck('name'); // ['Multiple Choice', 'True or False', ...]
+        // Mapear las etiquetas de pregunta seleccionadas
+        $mappedTypes = array_map(function ($type) {
+            return self::mapLabelToQuestionType($type);
+        }, $questionTypes);
+
+        Log::info('Selected question types after mapping: ' . json_encode($mappedTypes));
+
         $total = $quiz->num_questions;
-        $count = count($questionTypes);
+        $count = count($mappedTypes);
 
         if ($count === 0) {
             throw new \InvalidArgumentException('No question types selected for distribution.');
@@ -282,13 +289,19 @@ class QuizGenerationService
         $base = intdiv($total, $count);
         $leftover = $total % $count;
 
+        // Distribución final con la clave como tipo legible
         $distribution = [];
-        foreach ($types as $i => $type) {
-            $distribution[$type] = $base + ($i < $leftover ? 1 : 0);
+        foreach ($mappedTypes as $i => $type) {
+            $distribution[self::mapQuestionTypeLabel($type)] = $base + ($i < $leftover ? 1 : 0);
         }
+        Log::info('Total number of questions: ' . $quiz->num_questions);
+        Log::info('Distribution calculation: base questions per type: ' . $base);
+        Log::info('Leftover questions: ' . $leftover);
+        Log::info('Final question distribution: ' . json_encode($distribution));
 
-        return $distribution; // ['Multiple Choice' => 3, 'True or False' => 2, ...]
+        return $distribution; // Ejemplo: ['Multiple Choice' => 3, 'True or False' => 2]
     }
+
 
     public static function buildPrompt(string $content, Quiz $quiz,array $questionTypes): string
     {
@@ -308,7 +321,7 @@ class QuizGenerationService
 For each question, respond in JSON format with this structure:
 
 {
-  "question_text": "The question text",
+  "question_text": "The question text(Maximum 200 characters)",
   "question_type": "Multiple Choice | True or False | Open Question",
   "answers": [
     {
@@ -362,8 +375,15 @@ EOT;
 
     public static function generateWithGemini(string $content, Quiz $quiz,  array $questionTypes)
     {
+
+
         $apiKey = config('services.gemini.key');
-        $url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=$apiKey";
+        Log::info('Gemini API Key: ' . $apiKey);
+
+        Log::info('GEMINI_API_KEY: ' . env('GEMINI_API_KEY'));
+
+
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey";
 
         $prompt = self::buildPrompt($content, $quiz, $questionTypes);
 

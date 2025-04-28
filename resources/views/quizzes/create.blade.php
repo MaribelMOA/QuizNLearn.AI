@@ -124,7 +124,7 @@
                             <div class="flex flex-col space-y-2 mt-1">
                                 <label><input type="checkbox" name="question_types[]" value="multiple_choice" {{ is_array(old('question_types')) && in_array('multiple_choice', old('question_types')) ? 'checked' : '' }}> Opción Múltiple</label>
                                 <label><input type="checkbox" name="question_types[]" value="true_false" {{ is_array(old('question_types')) && in_array('true_false', old('question_types')) ? 'checked' : '' }}> Verdadero/Falso</label>
-                                <label><input type="checkbox" name="question_types[]" value="open_ended" {{ is_array(old('question_types')) && in_array('open_ended', old('question_types')) ? 'checked' : '' }} id="open_ended_checkbox"> Respuesta Abierta</label>
+                                <label><input type="checkbox" name="question_types[]" value="open_question" {{ is_array(old('question_types')) && in_array('open_question', old('question_types')) ? 'checked' : '' }} id="open_ended_checkbox"> Respuesta Abierta</label>
                                 <p id="open_ended_warning" class="text-xs text-red-500 hidden">No se permiten preguntas abiertas en el modo Arena.</p>
                             </div>
                             @error('question_types')

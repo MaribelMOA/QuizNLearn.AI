@@ -164,7 +164,7 @@
                                     <span class="text-xl">📈</span>
                                 </div>
                                 <p class="text-gray-600 text-sm mb-1">Avg. Score</p>
-                                <p class="text-3xl font-bold text-gray-800">{{ $quiz->avgScore }}</p>
+                                <p class="text-3xl font-bold text-gray-800">{{ $avgScore }}</p>
                             </div>
 
                             <div class="bg-gray-50 p-4 rounded-lg">
@@ -172,7 +172,7 @@
                                     <span class="text-xl">🏆</span>
                                 </div>
                                 <p class="text-gray-600 text-sm mb-1">Best Score</p>
-                                <p class="text-3xl font-bold text-yellow-600">{{ $quiz->bestScore }}</p>
+                                <p class="text-3xl font-bold text-yellow-600">{{ $bestScore }}</p>
                             </div>
 
                             <div class="bg-gray-50 p-4 rounded-lg">
@@ -180,7 +180,7 @@
                                     <span class="text-xl">📉</span>
                                 </div>
                                 <p class="text-gray-600 text-sm mb-1">Worst Score</p>
-                                <p class="text-3xl font-bold text-gray-800">{{ $quiz->worstScore }}</p>
+                                <p class="text-3xl font-bold text-gray-800">{{ $worstScore }}</p>
                             </div>
                         </div>
                     </div>
@@ -197,9 +197,8 @@
                         @php
                             $hasOpenQuestions = $quiz->questionTypes->pluck('name')->contains('open_question');
                         @endphp
-
-                        <div class="flex justify-center gap-6">
-                            <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-md flex items-center transition-colors">
+                     <div class="flex justify-center gap-6">
+                            <button onclick="redirectToQuizMode()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-md flex items-center transition-colors">
                                 <span class="mr-2">📝</span>
                                 Quiz Mode
                             </button>
@@ -315,6 +314,11 @@
 
             // Liberar la URL del Blob
             URL.revokeObjectURL(url);
+        }
+
+        function redirectToQuizMode() {
+            const selectedMode = 'yourModeHere'; // aquí pon el modo que quieras, o obténlo dinámicamente
+            window.location.href = `/quizzes/play/{{ $quiz->id }}?mode=Quiz`;
         }
 
     </script>

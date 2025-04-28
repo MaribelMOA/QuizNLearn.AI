@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('quiz_id')->constrained()->onDelete('cascade');
             $table->enum('mode', ['Quiz', 'Study', 'Arena']);
             $table->integer('total_time_seconds');
-            $table->integer('score')->nullable(); // Puede ser nulo
+            $table->decimal('score', 5, 2)->nullable();
             $table->timestamps();
         });
     }

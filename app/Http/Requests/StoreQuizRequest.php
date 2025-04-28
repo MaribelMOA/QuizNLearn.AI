@@ -46,7 +46,7 @@ class StoreQuizRequest extends FormRequest
             'manual_text' => ['nullable', 'string', 'max:' . $maxTextLimit],
             'topic' => ['nullable', 'string', 'max:255'],
             'question_types' => ['required', 'array'],
-            'question_types.*' =>  ['in:multiple_choice,true_false,open_ended'],
+            'question_types.*' =>  ['in:multiple_choice,true_false,open_question'],
 
             // 'quiz_data' => 'required|json', // El campo quiz_data debe ser un JSON válido
 
