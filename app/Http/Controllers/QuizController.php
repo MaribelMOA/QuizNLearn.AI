@@ -69,13 +69,18 @@ class QuizController extends Controller
 //        ->paginate(5);
 
         // Obtener cuestionarios, ordenados primero por el uso más reciente y luego por la fecha de creación
-        $questionnaires = $query->with(['questionTypes', 'quizQuestions', 'gameHistories']) // Cargar las relaciones necesarias
-        ->withCount('quizQuestions')
-            ->orderByDesc(GameHistory::selectRaw('MAX(created_at)') // Primero por la fecha más reciente de uso
-            ->whereColumn('quiz_id', 'quizzes.id')
-                ->limit(1)) // Selecciona el último uso para cada quiz
-            ->orderByDesc('created_at') // Luego por la fecha de creación (más reciente)
+        $questionnaires = $query
+            ->with(['questionTypes', 'quizQuestions', 'gameHistories'])
+            ->withCount('quizQuestions')
+            ->select('quizzes.*')
+            ->selectSub(
+                GameHistory::selectRaw('MAX(created_at)')
+                    ->whereColumn('quiz_id', 'quizzes.id'),
+                'last_game_history'
+            )
+            ->orderByRaw('COALESCE(last_game_history, quizzes.created_at) DESC')
             ->paginate(5);
+
 
 
 

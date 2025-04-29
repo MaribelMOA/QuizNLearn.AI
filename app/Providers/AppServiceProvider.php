@@ -22,7 +22,11 @@ class AppServiceProvider extends ServiceProvider
     {
         View::composer('*', function ($view) {
             // Verificar si la vista actual es una de quiz
-            if (request()->is('quizzes/*/play') || request()->is('quizzes/play/*') || request()->is('quizzes/submit-quiz-mode/*')  ) {
+            if (request()->is('quizzes/*/play') || request()->is('quizzes/play/*') || request()->is('quizzes/submit-quiz-mode/*')
+                || request()->is('quizzes/study/*')
+                || request()->is('quizzes/study/answer/*')
+                || request()->is('quizzes/study/finish/*')
+            ) {
                 $view->with('hideNavigation', true);
                 $view->with('isQuizPage', true);
             }else {

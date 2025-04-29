@@ -33,6 +33,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/quizzes/{quiz}/process', [QuizController::class, 'process'])->name('quizzes.process');
     Route::get('/quizzes/{quiz}/details', [QuizController::class, 'details'])->name('quizzes.details');
 
+
+
+
+
     Route::get('/download-quiz/{quiz_id}', [QuizController::class, 'downloadQuizAsPdf'])->name('quiz.downloadPdf');
 
 
@@ -47,6 +51,15 @@ Route::middleware('auth')->group(function () {
     // En routes/web.php
     Route::post('/quizzes/submit-quiz-mode/{questionnaire}', [GameHistoryController::class, 'submitQuizMode'])->name('quizzes.submitQuizMode');
     Route::get('/quizzes/results', [GameHistoryController::class, 'showQuizResults'])->name('quizzes.showQuizResults');
+
+
+    // Mostrar modo estudio
+    Route::get('/quizzes/study/{quiz}', [GameHistoryController::class, 'study'])->name('quizzes.study');
+// Enviar respuesta de una pregunta
+    Route::post('/quizzes/study/answer/{quiz}', [GameHistoryController::class, 'submitStudyAnswer'])->name('quizzes.study.answer');
+// Finalizar modo estudio
+    Route::match(['get', 'post'], '/quizzes/study/finish/{quiz}', [GameHistoryController::class, 'finishStudyMode'])->name('quizzes.study.finish');
+
 
     //Route::get('/play', [QuizController::class, 'play'])->name('features.index');
 

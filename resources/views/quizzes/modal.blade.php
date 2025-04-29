@@ -204,7 +204,7 @@
                             </button>
 
                             <!-- Study Mode -->
-                            <button
+                            <button onclick="redirectToStudyMode()"
                                 class="px-6 py-3 rounded-md flex items-center transition-colors
                 {{ $studyModeUses == 0 ? 'bg-gray-400 cursor-not-allowed text-gray-400 ' : 'bg-pink-500 hover:bg-pink-600 text-white' }}"
                                 {{ $studyModeUses == 0 ? 'disabled' : '' }}>
@@ -319,6 +319,10 @@
         function redirectToQuizMode() {
             const selectedMode = 'yourModeHere'; // aquí pon el modo que quieras, o obténlo dinámicamente
             window.location.href = `/quizzes/play/{{ $quiz->id }}?mode=Quiz`;
+        }
+        function redirectToStudyMode() {
+            const selectedMode = 'yourModeHere'; // aquí pon el modo que quieras, o obténlo dinámicamente
+            window.location.href = `/quizzes/play/{{ $quiz->id }}?mode=Study`;
         }
 
     </script>

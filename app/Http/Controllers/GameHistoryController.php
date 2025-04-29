@@ -13,6 +13,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 class GameHistoryController extends Controller
 {
     /**
@@ -84,6 +85,16 @@ class GameHistoryController extends Controller
 
         // Cargar las relaciones necesarias
         $questionnaire->load('quizQuestions.quizQuestionAnswers', 'quizQuestions.type');
+
+        if ($mode === 'Study') {
+            // Limpiar las preguntas previas de la sesión si existen
+            Session::forget('study_mode.questions');
+            Session::forget('study_mode.answers');
+            Session::forget('study_mode.start_time');
+
+            // Redirigir al método study, pasando el cuestionario como parámetro
+            return redirect()->route('quizzes.study', ['quiz' => $questionnaire->id]);
+        }
 
         if ($mode === 'Quiz') {
 //            return view('layouts.play', [
@@ -228,6 +239,163 @@ class GameHistoryController extends Controller
 
         return view('quizzes.quiz-mode-results', $quizResults);
     }
+
+
+    /****
+     * STUDY MODE
+    **/
+
+    public function study(Quiz $quiz, Request $request)
+    {
+        $user = Auth::user();
+        $uses = UsageService::calculateAvailableUses($user->id);
+
+        $studyModeUses = $uses['study_mode']['remaining'] ?? 5;
+
+        if ($studyModeUses <= 0) {
+            return redirect()->route('quizzes.index')
+                ->with('error', 'No tienes usos de Modo Estudio disponibles.');
+        }
+
+        $quiz->load('quizQuestions.quizQuestionAnswers', 'quizQuestions.type');
+
+        if ($quiz->quizQuestions->isEmpty()) {
+            return redirect()->route('quizzes.index')
+                ->with('error', 'Este cuestionario no tiene preguntas.');
+        }
+
+        // Iniciar sesión si aún no está iniciada
+        if (!Session::has('study_mode.questions') || Session::get('study_mode.quiz_id') !== $quiz->id) {
+            Session::put('study_mode.questions', $quiz->quizQuestions->pluck('id')->toArray());
+            Session::put('study_mode.answers', []);
+            Session::put('study_mode.start_time', now());
+
+            Log::info('Cargando modo estudio', [
+                'quiz_id' => $quiz->id,
+                'quiz_title' => $quiz->title ?? '(sin título)',
+                'total_questions' => $quiz->quizQuestions->count(),
+                'first_question' => optional($quiz->quizQuestions->first())->toArray(),
+            ]);
+        }
+
+
+
+        // Recuperar preguntas restantes de la sesión
+        $questionIds = Session::get('study_mode.questions', []);
+        $answered = Session::get('study_mode.answers', []);
+
+// Buscar la siguiente pregunta NO contestada
+        $nextQuestionId = null;
+        foreach ($questionIds as $qid) {
+            if (!array_key_exists($qid, $answered)) {
+                $nextQuestionId = $qid;
+                break;
+            }
+        }
+
+        if (!$nextQuestionId) {
+            // Todas las preguntas fueron contestadas
+            return redirect()->route('quizzes.study.finish', $quiz->id);
+        }
+
+// Cargar la pregunta
+        $nextQuestion = $quiz->quizQuestions->firstWhere('id', $nextQuestionId);
+
+        Log::info('Modo estudio - siguiente pregunta', [
+            'quiz_id' => $quiz->id,
+            'next_question_id' => $nextQuestionId,
+            'answered_count' => count($answered),
+        ]);
+
+        return view('quizzes.study-play', [
+            'quiz' => $quiz,
+            'question' => $nextQuestion,
+            'answeredQuestions' => count($answered),
+            'totalQuestions' => $quiz->num_questions,
+        ]);
+    }
+
+
+    public function submitStudyAnswer(Quiz $quiz, Request $request)
+    {
+        $request->validate([
+            'question_id' => 'required|exists:quiz_questions,id',
+            'answer' => 'required'
+        ]);
+
+        $questionId = $request->input('question_id');
+        $answer = $request->input('answer');
+
+        $question = $quiz->quizQuestions->where('id', $questionId)->first();
+        $correct = false;
+        $feedback = '';
+
+        if (!$question) {
+            return response()->json(['error' => 'Pregunta inválida.'], 400);
+        }
+
+        if ($question->type->name === 'open_question') {
+            $feedback = AIService::generateFeedback($question->question_text, $answer);
+        } else {
+            $correctAnswer = $question->quizQuestionAnswers->where('is_correct', true)->first();
+            $correct = ($answer == $correctAnswer->id);
+            if ($correct) {
+                $feedback = '¡Respuesta correcta! ' . ($correctAnswer->explanation ?? '');
+            } else {
+                $feedback = 'Respuesta incorrecta. ' . ($correctAnswer->explanation ?? '');
+            }
+        }
+
+
+        // Guardar en sesión
+        $currentAnswers = Session::get('study_mode.answers', []);
+        $currentAnswers[] = [
+            'question_id' => $questionId,
+            'given_answer' => $answer,
+            'correct' => $correct,
+        ];
+        Session::put('study_mode.answers', $currentAnswers);
+
+        // Manejar si la pregunta fue incorrecta: volver a agregarla
+        if (!$correct && $question->type->name !== 'open_question') {
+            // Eliminar pregunta contestada correctamente
+            $questions = Session::get('study_mode.questions', []);
+            $questions = array_filter($questions, function ($id) use ($questionId) {
+                return $id != $questionId;
+            });
+            Session::put('study_mode.questions', $questions);
+        }
+
+        return response()->json([
+            'success' => true,
+            'correct' => $correct,
+            'feedback' => $feedback,
+        ]);
+    }
+
+    public function finishStudyMode(Quiz $quiz)
+    {
+        $startTime = Session::get('study_mode.start_time');
+        $answers = Session::get('study_mode.answers', []);
+
+        $totalTimeSeconds = now()->diffInSeconds($startTime);
+
+        // Calcula XP: por ejemplo 10xp por respuesta correcta
+        $xpGained = collect($answers)->where('correct', true)->count() * 10;
+
+        // Borrar sesión
+        Session::forget('study_mode.questions');
+        Session::forget('study_mode.answers');
+        Session::forget('study_mode.start_time');
+
+        return view('quizzes.study-finished', [
+            'quiz' => $quiz,
+            'totalTimeSeconds' => $totalTimeSeconds,
+            'xpGained' => $xpGained,
+        ]);
+    }
+
+
 
 
 }
