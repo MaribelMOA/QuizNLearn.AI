@@ -244,7 +244,6 @@ class GameHistoryController extends Controller
     /****
      * STUDY MODE
     **/
-
     public function study(Quiz $quiz, Request $request)
     {
         $user = Auth::user();
@@ -257,6 +256,7 @@ class GameHistoryController extends Controller
                 ->with('error', 'No tienes usos de Modo Estudio disponibles.');
         }
 
+        // Cargar relaciones necesarias
         $quiz->load('quizQuestions.quizQuestionAnswers', 'quizQuestions.type');
 
         if ($quiz->quizQuestions->isEmpty()) {
@@ -265,26 +265,16 @@ class GameHistoryController extends Controller
         }
 
         // Iniciar sesión si aún no está iniciada
-        if (!Session::has('study_mode.questions') || Session::get('study_mode.quiz_id') !== $quiz->id) {
+        if (!Session::has('study_mode.questions')) {
             Session::put('study_mode.questions', $quiz->quizQuestions->pluck('id')->toArray());
             Session::put('study_mode.answers', []);
             Session::put('study_mode.start_time', now());
-
-            Log::info('Cargando modo estudio', [
-                'quiz_id' => $quiz->id,
-                'quiz_title' => $quiz->title ?? '(sin título)',
-                'total_questions' => $quiz->quizQuestions->count(),
-                'first_question' => optional($quiz->quizQuestions->first())->toArray(),
-            ]);
         }
 
-
-
-        // Recuperar preguntas restantes de la sesión
         $questionIds = Session::get('study_mode.questions', []);
         $answered = Session::get('study_mode.answers', []);
 
-// Buscar la siguiente pregunta NO contestada
+        // Buscar la siguiente pregunta no contestada
         $nextQuestionId = null;
         foreach ($questionIds as $qid) {
             if (!array_key_exists($qid, $answered)) {
@@ -294,11 +284,11 @@ class GameHistoryController extends Controller
         }
 
         if (!$nextQuestionId) {
-            // Todas las preguntas fueron contestadas
+            // Ya se contestaron todas las preguntas
             return redirect()->route('quizzes.study.finish', $quiz->id);
         }
 
-// Cargar la pregunta
+        // Buscar la pregunta por ID
         $nextQuestion = $quiz->quizQuestions->firstWhere('id', $nextQuestionId);
 
         Log::info('Modo estudio - siguiente pregunta', [
@@ -346,7 +336,6 @@ class GameHistoryController extends Controller
             }
         }
 
-
         // Guardar en sesión
         $currentAnswers = Session::get('study_mode.answers', []);
         $currentAnswers[] = [
@@ -357,7 +346,7 @@ class GameHistoryController extends Controller
         Session::put('study_mode.answers', $currentAnswers);
 
         // Manejar si la pregunta fue incorrecta: volver a agregarla
-        if (!$correct && $question->type->name !== 'open_question') {
+        if ($correct) {
             // Eliminar pregunta contestada correctamente
             $questions = Session::get('study_mode.questions', []);
             $questions = array_filter($questions, function ($id) use ($questionId) {
@@ -365,6 +354,7 @@ class GameHistoryController extends Controller
             });
             Session::put('study_mode.questions', $questions);
         }
+
 
         return response()->json([
             'success' => true,

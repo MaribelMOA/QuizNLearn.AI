@@ -24,16 +24,16 @@
                 <h3 class="text-lg font-semibold mb-4">{{ $question->question_text }}</h3>
 
                 @if ($question->type->name === 'multiple_choice' || $question->type->name === 'true_or_false')
-                <div class="space-y-3">
-                    @foreach ($question->quizQuestionAnswers as $answer)
-                    <label class="flex items-center space-x-2">
-                        <input type="radio" name="answer" value="{{ $answer->id }}" class="text-indigo-600">
-                        <span class="text-gray-700">{{ $answer->answer_text }}</span>
-                    </label>
-                    @endforeach
-                </div>
+                    <div class="space-y-3">
+                        @foreach ($question->quizQuestionAnswers as $answer)
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="answer" value="{{ $answer->id }}" class="text-indigo-600">
+                                <span class="text-gray-700">{{ $answer->answer_text }}</span>
+                            </label>
+                        @endforeach
+                    </div>
                 @elseif ($question->type->name === 'open_question')
-                <textarea name="answer" rows="3" class="w-full border-gray-300 rounded-md" placeholder="Tu respuesta..."></textarea>
+                    <textarea name="answer" rows="3" class="w-full border-gray-300 rounded-md" placeholder="Tu respuesta..."></textarea>
                 @endif
             </div>
 
@@ -77,6 +77,7 @@
             timer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }, 1000);
 
+
         function submitAnswer() {
             const form = document.getElementById('study-form');
             const formData = new FormData(form);
@@ -99,8 +100,8 @@
             window.location.href = "{{ route('quizzes.study', $quiz->id) }}";
             //location.reload(); // Cargar siguiente pregunta (actualizamos sesión)
         }
-       // document.querySelector('button[onclick="submitAnswer()"]').disabled = true;
-
     </script>
 
 </x-app-layout>
+
+
