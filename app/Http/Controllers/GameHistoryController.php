@@ -266,7 +266,8 @@ class GameHistoryController extends Controller
 
         // Iniciar sesión si aún no está iniciada
         if (!Session::has('study_mode.questions')) {
-            Session::put('study_mode.questions', $quiz->quizQuestions->pluck('id')->toArray());
+            $shuffled = $quiz->quizQuestions->pluck('id')->shuffle()->toArray();
+            Session::put('study_mode.questions', $shuffled);
             Session::put('study_mode.answers', []);
             Session::put('study_mode.start_time', now());
         }
@@ -274,22 +275,41 @@ class GameHistoryController extends Controller
         $questionIds = Session::get('study_mode.questions', []);
         $answered = Session::get('study_mode.answers', []);
 
-        // Buscar la siguiente pregunta no contestada
-        $nextQuestionId = null;
-        foreach ($questionIds as $qid) {
-            if (!array_key_exists($qid, $answered)) {
-                $nextQuestionId = $qid;
-                break;
+        // Verificar cuáles no han sido respondidas correctamente
+        $remaining = array_filter($questionIds, function ($id) use ($answered) {
+            foreach ($answered as $a) {
+                if ($a['question_id'] == $id && $a['correct']) {
+                    return false;
+                }
             }
-        }
+            return true;
+        });
 
-        if (!$nextQuestionId) {
-            // Ya se contestaron todas las preguntas
+        if (empty($remaining)) {
             return redirect()->route('quizzes.study.finish', $quiz->id);
         }
+        // Seleccionamos aleatoriamente una de las restantes
+        $nextQuestionId = collect($remaining)->random();
 
-        // Buscar la pregunta por ID
         $nextQuestion = $quiz->quizQuestions->firstWhere('id', $nextQuestionId);
+
+
+//        // Buscar la siguiente pregunta no contestada
+//        $nextQuestionId = null;
+//        foreach ($questionIds as $qid) {
+//            if (!array_key_exists($qid, $answered)) {
+//                $nextQuestionId = $qid;
+//                break;
+//            }
+//        }
+//
+//        if (!$nextQuestionId) {
+//            // Ya se contestaron todas las preguntas
+//            return redirect()->route('quizzes.study.finish', $quiz->id);
+//        }
+//
+//        // Buscar la pregunta por ID
+//        $nextQuestion = $quiz->quizQuestions->firstWhere('id', $nextQuestionId);
 
         Log::info('Modo estudio - siguiente pregunta', [
             'quiz_id' => $quiz->id,
@@ -297,11 +317,22 @@ class GameHistoryController extends Controller
             'answered_count' => count($answered),
         ]);
 
+        $startTime = Session::get('study_mode.start_time');
+        $elapsedSeconds = now()->diffInSeconds($startTime);
+
+//        $isLast = count(array_filter($questionIds, function ($id) use ($answered) {
+//                return !array_key_exists($id, $answered);
+//            })) === 1;
+
+
         return view('quizzes.study-play', [
             'quiz' => $quiz,
             'question' => $nextQuestion,
             'answeredQuestions' => count($answered),
             'totalQuestions' => $quiz->num_questions,
+            'elapsedSeconds' => $elapsedSeconds,
+            'isLastQuestion' => count($remaining) === 1,
+
         ]);
     }
 
@@ -310,11 +341,14 @@ class GameHistoryController extends Controller
     {
         $request->validate([
             'question_id' => 'required|exists:quiz_questions,id',
-            'answer' => 'required'
+            'answer' => 'required',
+            'elapsed_time' => 'required|integer',
         ]);
 
         $questionId = $request->input('question_id');
         $answer = $request->input('answer');
+        $elapsedTime = $request->input('elapsed_time'); // Tiempo recibido
+
 
         $question = $quiz->quizQuestions->where('id', $questionId)->first();
         $correct = false;
@@ -325,14 +359,23 @@ class GameHistoryController extends Controller
         }
 
         if ($question->type->name === 'open_question') {
-            $feedback = AIService::generateFeedback($question->question_text, $answer);
+            $correctAnswer = $question->quizQuestionAnswers->first()?->answer_text ?? '';
+            $aiResponse = PlayModesService::evaluateOpenQuestionWithAI($question->question_text, $answer, $correctAnswer);
+
+            $correct = $aiResponse['correct'];
+            $feedback = $aiResponse['feedback'];
+            if ($correct) {
+                $feedback = 'Correct! ' . ($feedback ?? '');
+            } else {
+                $feedback = 'Incorrect. ' . ($feedback ?? '');
+            }
         } else {
             $correctAnswer = $question->quizQuestionAnswers->where('is_correct', true)->first();
             $correct = ($answer == $correctAnswer->id);
             if ($correct) {
-                $feedback = '¡Respuesta correcta! ' . ($correctAnswer->explanation ?? '');
+                $feedback = 'Correct! ' . ($correctAnswer->explanation ?? '');
             } else {
-                $feedback = 'Respuesta incorrecta. ' . ($correctAnswer->explanation ?? '');
+                $feedback = 'Incorrect. ' . ($correctAnswer->explanation ?? '');
             }
         }
 
@@ -363,20 +406,42 @@ class GameHistoryController extends Controller
         ]);
     }
 
-    public function finishStudyMode(Quiz $quiz)
+    public function finishStudyMode(Quiz $quiz, Request $request)
     {
+
         $startTime = Session::get('study_mode.start_time');
-        $answers = Session::get('study_mode.answers', []);
 
-        $totalTimeSeconds = now()->diffInSeconds($startTime);
+        if (!$startTime) {
+                Log::info("no start tiem");      }
 
-        // Calcula XP: por ejemplo 10xp por respuesta correcta
-        $xpGained = collect($answers)->where('correct', true)->count() * 10;
+       // $totalTimeSeconds = now()->diffInSeconds($startTime);
+        $totalTimeSeconds = $request->input('total_time_seconds', 60); // 60 segundos por defecto si no se envía nada
+        Log::info("total time seconds", ['value' => $totalTimeSeconds]);
 
+
+        // Calcula XP:  fórmula con base en total de preguntas y rapidez
+        $totalQuestions = $quiz->num_questions; // o count(Session::get('study_mode.questions'))
+        $timePenalty = max(1, $totalTimeSeconds / 60); // evita división entre 0
+
+        // XP = más preguntas en menos tiempo => más puntos
+        $xpGained = round($totalQuestions * 2 / $timePenalty);
         // Borrar sesión
         Session::forget('study_mode.questions');
         Session::forget('study_mode.answers');
         Session::forget('study_mode.start_time');
+
+        // 👉 Guardar en GameHistory
+        $user = Auth::user();
+        $score = $xpGained; // o usa otra lógica si tienes un score separado
+        $mode = 'Study'; // o usa el valor real si lo pasas por otro lado
+
+        $gameHistory = GameHistory::create([
+            'user_id' => $user->id,
+            'quiz_id' => $quiz->id,
+            'mode' => $mode,
+            'total_time_seconds' => $totalTimeSeconds,
+            'score' => 100,
+        ]);
 
         return view('quizzes.study-finished', [
             'quiz' => $quiz,

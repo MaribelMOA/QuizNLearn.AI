@@ -7,7 +7,7 @@
             </div>
 
             <div class="flex items-center space-x-4">
-                <p id="question-counter" class="text-sm text-gray-600">{{ $answeredQuestions }} / {{ $totalQuestions }}</p>
+                <p id="question-counter" class="text-sm text-gray-600">Total quesitions: {{ $totalQuestions }}</p>
                 <div class="flex items-center text-lg text-gray-700 font-bold">
                     ⏱️ <span id="timer">00:00</span>
                 </div>
@@ -38,16 +38,18 @@
             </div>
 
             <div class="flex justify-end space-x-4">
-                <button type="button" onclick="submitAnswer()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded">
-                    Enviar Respuesta
+                <button  id="submit-button" type="button" onclick="submitAnswer()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded">
+                    Submit answer
                 </button>
             </div>
         </form>
 
         <div id="feedback" class="mt-6 hidden">
             <p class="text-lg font-medium" id="feedback-text"></p>
-            <button id="next-question" class="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded hidden" onclick="loadNextQuestion()">
-                Next
+            <button id="next-question"
+                    class="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded hidden"
+                    onclick="loadNextQuestion()">
+                {{ $isLastQuestion ? 'Finish' : 'Next' }}
             </button>
         </div>
 
@@ -64,23 +66,38 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
-        let seconds = 0;
-        let minutes = 0;
-        const timer = document.getElementById('timer');
+        {{--let totalSeconds = {{ $elapsedSeconds ?? 0 }};--}}
+        {{--const timer = document.getElementById('timer');--}}
+
+        {{--setInterval(() => {--}}
+        {{--    totalSeconds++;--}}
+        {{--    const minutes = Math.floor(totalSeconds / 60);--}}
+        {{--    const seconds = totalSeconds % 60;--}}
+        {{--    timer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;--}}
+        {{--}, 1000);--}}
+        let totalSeconds = sessionStorage.getItem("studyTimer") || 0;
+        totalSeconds = parseInt(totalSeconds);
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
 
         setInterval(() => {
-            seconds++;
-            if (seconds === 60) {
-                minutes++;
-                seconds = 0;
-            }
-            timer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            totalSeconds++;
+            sessionStorage.setItem("studyTimer", totalSeconds);
+            document.getElementById("timer").textContent = formatTime(totalSeconds);
         }, 1000);
 
-
         function submitAnswer() {
+            const submitBtn = document.getElementById('submit-button');
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
             const form = document.getElementById('study-form');
             const formData = new FormData(form);
+            formData.append("elapsed_time", totalSeconds);
 
             axios.post("{{ route('quizzes.study.answer', $quiz->id) }}", formData)
                 .then(response => {
@@ -89,10 +106,19 @@
 
                     document.getElementById('feedback').classList.remove('hidden');
                     document.getElementById('feedback-text').innerText = feedback;
-                    document.getElementById('next-question').classList.remove('hidden');
+
+                    if (@json($isLastQuestion)) {
+                        document.getElementById('finish-section').classList.remove('hidden');
+                        document.getElementById('next-question').classList.add('hidden');
+                    } else {
+                        document.getElementById('next-question').classList.remove('hidden');
+                    }
                 })
                 .catch(error => {
                     alert('You must answer the question before moving on.');
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
                 });
         }
 

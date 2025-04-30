@@ -70,4 +70,64 @@ class PlayModesService
         }
     }
 
+    public static function evaluateOpenQuestionWithAI($question, $userAnswer, $correctAnswer)
+    {
+        Log::info("AI evaluating open question with feedback");
+        $apiKey = config('services.gemini.key');
+        $url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=$apiKey";
+
+        $prompt = "Given the question: '$question', the correct answer is: '$correctAnswer'. The user answered: '$userAnswer'. "
+            . "1. Evaluate if the answer is semantically correct. "
+            . "2. Respond in JSON format as: {\"result\": \"correct/incorrect\", \"feedback\": \"[short feedback in English, max 150 characters]\"}. "
+            . "Only return the JSON object. No other text.";
+
+        $postData = [
+            "contents" => [
+                [
+                    "parts" => [
+                        ["text" => $prompt]
+                    ]
+                ]
+            ]
+        ];
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
+
+        $response = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            Log::error('Curl error during evaluateWithAI: ' . curl_error($ch));
+            curl_close($ch);
+            return ['correct' => false, 'feedback' => 'There was an error processing your answer.'];
+        }
+
+        curl_close($ch);
+
+        $data = json_decode($response, true);
+
+        if (!isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+            Log::error('Unexpected Gemini API response: ' . $response);
+            return ['correct' => false, 'feedback' => 'There was an error processing your answer.'];
+        }
+
+        $jsonText = trim($data['candidates'][0]['content']['parts'][0]['text']);
+        $jsonText = preg_replace('/^```json|```$/i', '', $jsonText); // elimina marcas ```json y ```
+        $json = json_decode(trim($jsonText), true);
+
+        if (!isset($json['result']) || !isset($json['feedback'])) {
+            Log::error("Invalid JSON from Gemini: " . $data['candidates'][0]['content']['parts'][0]['text']);
+            return ['correct' => false, 'feedback' => 'Invalid response from AI.'];
+        }
+
+        return [
+            'correct' => strtolower($json['result']) === 'correct',
+            'feedback' => substr($json['feedback'], 0, 150) // asegurarse del límite
+        ];
+    }
+
+
 }
