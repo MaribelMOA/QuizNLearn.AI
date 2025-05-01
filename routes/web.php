@@ -52,7 +52,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/quizzes/submit-quiz-mode/{questionnaire}', [GameHistoryController::class, 'submitQuizMode'])->name('quizzes.submitQuizMode');
     Route::get('/quizzes/results', [GameHistoryController::class, 'showQuizResults'])->name('quizzes.showQuizResults');
 
-
     // Mostrar modo estudio
     Route::get('/quizzes/study/{quiz}', [GameHistoryController::class, 'study'])->name('quizzes.study');
 // Enviar respuesta de una pregunta
