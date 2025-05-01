@@ -25,14 +25,34 @@
         <p class="text-gray-600 text-sm mb-4">Create new game and share with friends</p>
     </div>
 
-    <div class="mt-auto">
-        <a href="{{ route('arena.create') }}" class="block w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium rounded-md transition-colors text-center shadow-md">
-            Create game
-        </a>
-    </div>
+{{--    <div class="mt-auto">--}}
+{{--        <a href="{{ route('arena.create') }}" class="block w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium rounded-md transition-colors text-center shadow-md">--}}
+{{--            Create game--}}
+{{--        </a>--}}
+{{--    </div>--}}
+    <button
+        onclick="handleArenaCreate({{ $arenaModeUses }})"
+        class="block w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium rounded-md transition-colors text-center shadow-md">
+        Create game
+    </button>
 
     <div class="mt-6 text-center">
         <p class="text-sm text-gray-500">You have <span class="font-semibold text-purple-600">{{ $arenaModeUses }}</span> Arena mode uses left</p>
     </div>
 </div>
+<script>
+    function handleArenaCreate(usesLeft) {
+        if (usesLeft <= 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Youve reached your limit',
+                text: 'You have no Arena Mode uses left. Try upgrading plan or buying Arena mode uses.',
+                confirmButtonColor: '#6366F1'
+            });
+           // alert("You have no Arena Mode uses left. Upgrade your plan to continue.");
+        } else {
+            window.location.href = "{{ route('quizzes.choose-quiz') }}";
+        }
+    }
+</script>
 

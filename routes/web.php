@@ -60,7 +60,13 @@ Route::middleware('auth')->group(function () {
     Route::match(['get', 'post'], '/quizzes/study/finish/{quiz}', [GameHistoryController::class, 'finishStudyMode'])->name('quizzes.study.finish');
     Route::match(['get', 'post'], '/quizzes/play/exit/{quiz}', [GameHistoryController::class, 'exitMode'])->name('quizzes.exit');
 
+    //MODO ARENA
 
+    //HOST
+    //chooseArenaQuiz
+
+    Route::get('/quizzes/arena/choose-quiz', [ArenaGameController::class, 'chooseArenaQuiz'])->name('quizzes.choose-quiz');
+    Route::get('/quizzes/arena/start/{quiz}', [GameHistoryController::class, 'startArenaQuiz'])->name('arena.startQuiz');
     //Route::get('/play', [QuizController::class, 'play'])->name('features.index');
 
     //Route::resource('quiz-questions', QuizQuestionController::class);

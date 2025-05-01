@@ -119,7 +119,7 @@ class GameHistoryController extends Controller
 
         // Si llega un modo desconocido
         return redirect()->route('quizzes.index')
-            ->with('error', 'Modo de juego no válido.');
+            ->with('error', 'Invalid Game mode.');
     }
 
     public function submitQuizMode(Quiz $questionnaire, Request $request)
@@ -466,6 +466,10 @@ class GameHistoryController extends Controller
 
         return redirect()->route('quizzes.index')->with('message', 'Game mode closed.');
     }
+
+
+    public function startArenaQuiz(Quiz $quiz, Request $request){}
+
 
 
 

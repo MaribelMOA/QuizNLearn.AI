@@ -101,7 +101,7 @@ class QuizController extends Controller
         $studyModeUses = $uses['study_mode']['remaining']?? 5;
         $arenaModeUses = $uses['arena_mode']['remaining']?? 6;
 //        $studyModeUses = 0;
-//        $arenaModeUses = 0;
+  //      $arenaModeUses = 0;
      //   $availableCreations=0;
 
 
@@ -425,7 +425,7 @@ class QuizController extends Controller
         $quiz->delete();
 
         // Redirigir a la lista de quizzes con un mensaje de éxito
-        return redirect()->route('quizzes.index')->with('success', 'Quiz eliminado exitosamente.');
+        return redirect()->route('quizzes.index')->with('success', 'Quiz succesfully deleted.');
     }
 
 
