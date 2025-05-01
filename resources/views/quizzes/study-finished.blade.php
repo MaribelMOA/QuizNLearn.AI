@@ -4,13 +4,14 @@
         <h2 class="text-3xl font-bold text-gray-800 mb-6">¡Study Mode Finalized!</h2>
 
         <p class="text-xl text-gray-600 mb-4">
-            @php
-                $hours = floor($totalTimeSeconds / 3600);
-                $minutes = floor(($totalTimeSeconds % 3600) / 60);
-                $seconds = $totalTimeSeconds % 60;
-            @endphp
+{{--            @php--}}
+{{--                $hours = floor($totalTimeSeconds / 3600);--}}
+{{--                $minutes = floor(($totalTimeSeconds % 3600) / 60);--}}
+{{--                $seconds = $totalTimeSeconds % 60;--}}
+{{--            @endphp--}}
 
-            Total Time: {{ $hours }}h {{ $minutes }}m {{ $seconds }}s
+{{--            Total Time: {{ $hours }}h {{ $minutes }}m {{ $seconds }}s--}}
+            ⏱️ Total time in Study mode: {{ gmdate('i:s', $totalTimeSeconds) }}
         </p>
 
 

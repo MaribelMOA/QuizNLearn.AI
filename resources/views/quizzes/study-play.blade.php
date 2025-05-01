@@ -57,7 +57,7 @@
             <form action="{{ route('quizzes.study.finish', $quiz->id) }}" method="POST">
                 @csrf
                 <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded text-lg">
-                    Finalizar Estudio
+                    Finish Study Mode
                 </button>
             </form>
         </div>
@@ -66,38 +66,38 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
-        {{--let totalSeconds = {{ $elapsedSeconds ?? 0 }};--}}
-        {{--const timer = document.getElementById('timer');--}}
 
-        {{--setInterval(() => {--}}
-        {{--    totalSeconds++;--}}
-        {{--    const minutes = Math.floor(totalSeconds / 60);--}}
-        {{--    const seconds = totalSeconds % 60;--}}
-        {{--    timer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;--}}
-        {{--}, 1000);--}}
-        let totalSeconds = sessionStorage.getItem("studyTimer") || 0;
-        totalSeconds = parseInt(totalSeconds);
+        let startTime = @json(\Illuminate\Support\Carbon::parse(session('study_mode.start_time'))->timestamp);
+        let timerElement = document.getElementById('timer');
 
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        function updateTimer() {
+            const now = Math.floor(Date.now() / 1000);
+            let elapsed = now - startTime;
+
+            let minutes = Math.floor(elapsed / 60);
+            let seconds = elapsed % 60;
+
+            timerElement.textContent =
+                String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
         }
 
-        setInterval(() => {
-            totalSeconds++;
-            sessionStorage.setItem("studyTimer", totalSeconds);
-            document.getElementById("timer").textContent = formatTime(totalSeconds);
-        }, 1000);
-
+        setInterval(updateTimer, 1000);
+        updateTimer();
         function submitAnswer() {
             const submitBtn = document.getElementById('submit-button');
-            submitBtn.disabled = true;
-            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
             const form = document.getElementById('study-form');
             const formData = new FormData(form);
-            formData.append("elapsed_time", totalSeconds);
+           // formData.append("elapsed_time", totalSeconds);
+            const answer = formData.get('answer');
+
+            if (!answer || answer.trim() === '') {
+                alert('You must answer the question before moving on.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
             axios.post("{{ route('quizzes.study.answer', $quiz->id) }}", formData)
                 .then(response => {

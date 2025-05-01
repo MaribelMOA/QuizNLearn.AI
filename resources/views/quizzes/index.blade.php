@@ -93,6 +93,7 @@
                                 @endif
                             </div>
                         </div>
+                        <!--
                         <div class="flex gap-2">
                             <select name="difficulty_level" class="rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
                                 <option value="">All levels</option>
@@ -110,7 +111,7 @@
                             <button type="submit" class="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors">
                                 Filter
                             </button>
-                        </div>
+                        </div>-->
                     </form>
                 </div>
             </div>
