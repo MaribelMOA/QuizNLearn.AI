@@ -26,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
                 || request()->is('quizzes/study/*')
                 || request()->is('quizzes/study/answer/*')
                 || request()->is('quizzes/study/finish/*')
+                || request()->is('quizzes/play/exit/*')
             ) {
                 $view->with('hideNavigation', true);
                 $view->with('isQuizPage', true);

@@ -22,7 +22,7 @@
     document.getElementById('close-quiz').addEventListener('click', function() {
         Swal.fire({
             title: 'Are you sure you want to exit?',
-            text: "Your progress will be lost",
+            text: "Your play mode use will be reduced if you've answered more that half the quesitons",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -31,7 +31,25 @@
             cancelButtonText: 'Cancel'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = "{{ route('quizzes.index') }}";
+                {{--window.location.href = "{{ route('quizzes.index') }}";--}}
+                // Obtener el modo desde la sesión de Laravel (inyectado en blade)
+                let mode = "{{ session('game_mode') }}";
+                let quizId = "{{ session('current_quiz_id') }}";
+
+                // Solo enviar petición si es Study o Arena
+                if (mode === 'Study' || mode === 'Arena' && quizId) {
+                    axios.post(`/quizzes/play/exit/${quizId}`, {
+                        mode: mode
+                    }).then(() => {
+
+                        window.location.href = "{{ route('quizzes.index') }}";
+                    }).catch(() => {
+                        Swal.fire('Oops', 'An error occurred while exiting.', 'error');
+                    });
+                } else {
+                    // Si es Quiz mode, solo redirige sin guardar
+                    window.location.href = "{{ route('quizzes.index') }}";
+                }
             }
         });
     });

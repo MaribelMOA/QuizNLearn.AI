@@ -58,6 +58,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/quizzes/study/answer/{quiz}', [GameHistoryController::class, 'submitStudyAnswer'])->name('quizzes.study.answer');
 // Finalizar modo estudio
     Route::match(['get', 'post'], '/quizzes/study/finish/{quiz}', [GameHistoryController::class, 'finishStudyMode'])->name('quizzes.study.finish');
+    Route::match(['get', 'post'], '/quizzes/play/exit/{quiz}', [GameHistoryController::class, 'exitMode'])->name('quizzes.exit');
 
 
     //Route::get('/play', [QuizController::class, 'play'])->name('features.index');
