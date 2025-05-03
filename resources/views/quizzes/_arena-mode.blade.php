@@ -5,19 +5,33 @@
     </div>
 
     <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6 mb-8">
-        <div class="mb-6">
-            <label for="display_name" class="block text-sm font-medium text-gray-700 mb-1">Player Name:</label>
-            <input type="text" id="display_name" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" placeholder="Enter name">
-        </div>
+        <form action="{{ route('arena.join') }}" method="POST">
+            @csrf
+            <div class="mb-4">
+                <label for="player_name" class="block text-sm font-medium text-gray-700">Player Name:</label>
+                <input type="text" name="player_name" id="player_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+            </div>
 
-        <div class="mb-6">
-            <label for="game_pin" class="block text-sm font-medium text-gray-700 mb-1">Game PIN</label>
-            <input type="text" id="game_pin" class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" placeholder="Enter PIN">
-        </div>
+            <div class="mb-4">
+                <label for="pin" class="block text-sm font-medium text-gray-700">Game PIN:</label>
+                <input type="text" name="pin" id="pin" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm uppercase" required>
+            </div>
 
-        <button type="button" class="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-md transition-colors shadow-md">
-            Join Game
-        </button>
+            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-md">
+                Join Game
+            </button>
+
+{{--            @if ($errors->any())--}}
+{{--                <div class="alert alert-danger">--}}
+{{--                    <ul>--}}
+{{--                        @foreach ($errors->all() as $error)--}}
+{{--                            <li>{{ $error }}</li>--}}
+{{--                        @endforeach--}}
+{{--                    </ul>--}}
+{{--                </div>--}}
+{{--            @endif--}}
+
+        </form>
     </div>
 
     <div class="text-center mb-6">

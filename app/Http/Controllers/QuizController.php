@@ -101,7 +101,7 @@ class QuizController extends Controller
         $studyModeUses = $uses['study_mode']['remaining']?? 5;
         $arenaModeUses = $uses['arena_mode']['remaining']?? 6;
 //        $studyModeUses = 0;
-  //      $arenaModeUses = 0;
+        $arenaModeUses = 50;
      //   $availableCreations=0;
 
 
@@ -437,7 +437,8 @@ class QuizController extends Controller
         $uses = UsageService::calculateAvailableUses($user->id);
 
         $studyModeUses = $uses['study_mode']['remaining'] ?? 5;
-        $arenaModeUses = $uses['arena_mode']['remaining'] ?? 6;
+       // $arenaModeUses = $uses['arena_mode']['remaining'] ?? 6;
+        $arenaModeUses=50;
 
         // Verificar si el usuario tiene usos disponibles para el modo seleccionado
         if ($mode === 'Study' && $studyModeUses <= 0) {
@@ -446,6 +447,11 @@ class QuizController extends Controller
         }
 
         if ($mode === 'Arena' && $arenaModeUses <= 0) {
+            return redirect()->route('quizzes.index')
+                ->with('error', 'No tienes usos de Modo Arena disponibles.');
+        }
+
+        if ($mode === 'Arena') {
             return redirect()->route('quizzes.index')
                 ->with('error', 'No tienes usos de Modo Arena disponibles.');
         }

@@ -55,15 +55,15 @@
                         </div>
                         <input type="text" name="search" id="search-input" value="{{ request('search') }}" class="pl-10 pr-10 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" placeholder="Search by title, mode, difficulty or exact number of questions">
                         @if(request('search'))
-                            <button type="button" id="clear-search" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
-                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        @endif
-                    </div>
-                </form>
-            </div>-->
+                <button type="button" id="clear-search" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+@endif
+            </div>
+        </form>
+    </div>-->
 
 
 
@@ -120,20 +120,20 @@
             <!-- Quiz Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                    <!-- Create New Quiz Card -->
-                    <button id="openModalButton" class="bg-white overflow-hidden shadow-sm sm:rounded-lg border-2 border-dashed border-gray-300 hover:border-primary transition-colors flex flex-col items-center justify-center p-10 text-center">
-                        <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Create New Quiz</h3>
-                        <p class="text-gray-500">Create a new personalized quiz with AI</p>
-                    </button>
+                <!-- Create New Quiz Card -->
+                <button id="openModalButton" class="bg-white overflow-hidden shadow-sm sm:rounded-lg border-2 border-dashed border-gray-300 hover:border-primary transition-colors flex flex-col items-center justify-center p-10 text-center">
+                    <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-2">Create New Quiz</h3>
+                    <p class="text-gray-500">Create a new personalized quiz with AI</p>
+                </button>
 
-                    <!-- Quiz Cards -->
-                    @forelse($questionnaires as $questionnaire)
-                        @include('quizzes._quiz-card', ['questionnaire' => $questionnaire])
+                <!-- Quiz Cards -->
+                @forelse($questionnaires as $questionnaire)
+                    @include('quizzes._quiz-card', ['questionnaire' => $questionnaire])
                     <script>
 
                         document.addEventListener("DOMContentLoaded", function() {
@@ -144,7 +144,7 @@
                             const studyModeUses = {{ $studyModeUses }};
 
                             //LO DE DESHABILITAR
-                         //   modeSelect.addEventListener('change', updateStartButtonStyle);
+                            //   modeSelect.addEventListener('change', updateStartButtonStyle);
 
 
                             startButton.addEventListener('click', function(event) {
@@ -218,27 +218,27 @@
 
                         });
                     </script>
-                    @empty
-                        <div class="col-span-full bg-white rounded-lg shadow-sm p-6 text-center border border-gray-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <h3 class="text-lg font-medium text-gray-900 mb-2">No quizzes found</h3>
-                            <p class="text-gray-500 mb-4">You haven't created any quizzes yet or none match your search criteria.</p>
-                            <a href="{{ route('quizzes.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                                Create Your First Quiz
-                            </a>
-                        </div>
-                    @endforelse
-                </div>
-
+                @empty
+                    <div class="col-span-full bg-white rounded-lg shadow-sm p-6 text-center border border-gray-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No quizzes found</h3>
+                        <p class="text-gray-500 mb-4">You haven't created any quizzes yet or none match your search criteria.</p>
+                        <a href="{{ route('quizzes.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                            Create Your First Quiz
+                        </a>
+                    </div>
+                @endforelse
             </div>
 
-            <!-- Pagination -->
-            <div class="mt-6">
-                {{ $questionnaires->links() }}
-            </div>
         </div>
+
+        <!-- Pagination -->
+        <div class="mt-6">
+            {{ $questionnaires->links() }}
+        </div>
+    </div>
     </div>
     <!-- Arena Mode Sidebar -->
     <div class="fixed  right-0 top-0 h-full w-80 bg-white shadow-lg transform transition-transform duration-300 ease-in-out"
@@ -446,7 +446,7 @@
 
         <!-- Script para abrir y cerrar el modal --><!-- Script para abrir y cerrar el modal -->
         const availableCreations = @json($availableCreations);
-       // const maxUrls = @json($planLimits['urls']);//planLimits.urls;
+        // const maxUrls = @json($planLimits['urls']);//planLimits.urls;
 
         document.addEventListener('DOMContentLoaded', () => {
             const openModalButton = document.getElementById('openModalButton');
@@ -473,14 +473,15 @@
 
             // Mostrar modal si hay errores de validación
             @if ($errors->any())
-                modal.classList.remove('hidden');
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Error with submission',
-                    text: @json($errors->all()),
-                    confirmButtonColor: '#6366F1'
-                });
-                console.log("Erros: ",@json($errors->all()));
+          //
+          //modal.classList.remove('hidden');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Error with submission',
+                text: @json($errors->all()),
+                confirmButtonColor: '#6366F1'
+            });
+            console.log("Erros: ",@json($errors->all()));
             @endif
 
             // Cerrar modal cuando se presiona el botón de cierre
@@ -565,14 +566,26 @@
         document.addEventListener('DOMContentLoaded', function () {
             // Validación de campos requeridos
             function checkFields() {
-                const requiredFields = document.querySelectorAll('[required]');
+                const requiredFields = document.querySelectorAll('#quizForm[required]');
                 let allFilled = true;
                 requiredFields.forEach(field => {
                     if (!field.value.trim()) {
                         allFilled = false;
                     }
                 });
-                document.getElementById('submit_button').disabled = !allFilled;
+
+                //document.getElementById('submit_button').disabled = !allFilled;
+                // Obtener el botón de submit
+                const submitButton = document.getElementById('submit_button');
+
+                // Cambiar la opacidad del botón dependiendo de si todos los campos están llenos
+                if (allFilled) {
+                    submitButton.style.opacity = '1';  // Hacer el botón completamente visible
+                    submitButton.disabled = false;    // Habilitar el botón
+                } else {
+                    submitButton.style.opacity = '0.5';  // Reducir la opacidad si falta algún campo
+                    submitButton.disabled = true;        // Deshabilitar el botón
+                }
             }
 
             // Activar validación al cambiar inputs
@@ -802,5 +815,7 @@
 
     </script>
 </x-app-layout>
+
+
 
 

@@ -66,7 +66,27 @@ Route::middleware('auth')->group(function () {
     //chooseArenaQuiz
 
     Route::get('/quizzes/arena/choose-quiz', [ArenaGameController::class, 'chooseArenaQuiz'])->name('quizzes.choose-quiz');
-    Route::get('/quizzes/arena/start/{quiz}', [GameHistoryController::class, 'startArenaQuiz'])->name('arena.startQuiz');
+    Route::get('/quizzes/arena/start/{quiz}', [GameHistoryController::class, 'startArenaGame'])->name('arena.startQuiz');
+
+
+
+    Route::prefix('/quizzes/arena')->group(function () {
+      //  Route::get('/{quizId}/host-lobby', [GameHistoryController::class, 'hostLobby'])->name('quizzes.host-lobby');
+        Route::get('/{quizId}/host-question', [GameHistoryController::class, 'hostQuestion'])->name('quizzes.host-question');
+        Route::get('/{quizId}/waiting-room', [GameHistoryController::class, 'waitingRoom'])->name('quizzes.waiting-room');
+        Route::get('/{quizId}/podium', [GameHistoryController::class, 'podium'])->name('quizzes.podium');
+        Route::post('/{quizId}/start', [GameHistoryController::class, 'startGame'])->name('quizzes.start-game');
+
+    });
+   // Route::post('/{quizId}/start', [GameHistoryController::class, 'startGame'])->name('quizzes.start-game');
+
+    Route::post('/join-arena', [ArenaGameController::class, 'joinGame'])->name('arena.join');
+
+    Route::get('/arena/waiting', function () {
+        return view('quizzes.waiting');
+    })->name('arena.waiting');
+
+
     //Route::get('/play', [QuizController::class, 'play'])->name('features.index');
 
     //Route::resource('quiz-questions', QuizQuestionController::class);

@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CorrectAnswerShown;
+use App\Events\GameStarted;
+use App\Events\PlayerJoined;
+use App\Events\QuestionChanged;
 use App\Http\Requests\StoreGameHistoryRequest;
 use App\Http\Requests\UpdateGameHistoryRequest;
 use App\Models\GameHistory;
@@ -14,6 +18,10 @@ use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+
+
+use Illuminate\Support\Str;
+use App\Models\ArenaGame;
 class GameHistoryController extends Controller
 {
     /**
@@ -70,8 +78,9 @@ class GameHistoryController extends Controller
         $uses = UsageService::calculateAvailableUses($user->id);
 
         $studyModeUses = $uses['study_mode']['remaining'] ?? 5;
-        $arenaModeUses = $uses['arena_mode']['remaining'] ?? 6;
+       // $arenaModeUses = $uses['arena_mode']['remaining'] ?? 6;
 
+        $arenaModeUses=50;
         // Verificar si el usuario tiene usos disponibles para el modo seleccionado
         if ($mode === 'Study' && $studyModeUses <= 0) {
             return redirect()->route('quizzes.index')
@@ -99,6 +108,12 @@ class GameHistoryController extends Controller
             // Redirigir al método study, pasando el cuestionario como parámetro
             return redirect()->route('quizzes.study', ['quiz' => $questionnaire->id]);
         }
+
+        if ($mode === 'Arena') {
+            return $this->startArenaGame($questionnaire, $user);
+        }
+
+
 
         if ($mode === 'Quiz') {
 //            return view('layouts.play', [
@@ -467,8 +482,217 @@ class GameHistoryController extends Controller
         return redirect()->route('quizzes.index')->with('message', 'Game mode closed.');
     }
 
+    /***
+    ARENA GAME
+     ***/
 
-    public function startArenaQuiz(Quiz $quiz, Request $request){}
+    public function startArenaGame(Quiz $quiz){
+        $user = Auth::user();
+
+        // Obtener el plan del usuario (host)
+        // Obtener el plan del usuario (host)
+        $userPlan = $user->plan()->latest()->first();  // Obtener el último plan del usuario
+        $maxPlayers = $userPlan ? $userPlan->max_arena_players : 0;
+
+        // Crear registro en game_histories
+        $history = GameHistory::create([
+                    'user_id' => Auth::id(),
+                    'quiz_id' => $quiz->id,
+                    'mode' => 'Arena',
+                    'total_time_seconds' => 0,
+                    'score' => 100, // O ajusta según lo que consideres
+                ]);
+
+        // Generar PIN único
+        $pin = Str::upper(Str::random(6));
+
+        // Crear ArenaGame
+        $arenaGame = ArenaGame::create([
+            'game_history_id' => $history->id,
+            'pin' => $pin,
+            'start_time' => now(),
+            'status' => 'active',
+        ]);
+
+        Session::put('arena_quiz_id', $quiz->id);
+        Session::put('game_mode', 'Arena');
+        Session::put('game_pin', $pin);
+        Session::put('used_questions', []);
+
+        Log::info('Arena game id'.$arenaGame->id);
+        return view('quizzes.host-lobby', ['quiz' => $quiz,
+            'quizId' => $quiz->id,
+            'pin' => $pin,
+            'arenaGameId' => $arenaGame->id,
+            'maxPlayers' => $maxPlayers,]);
+//        return view('quizzes.host-lobby', [
+//            'arenaGame' => $arenaGame
+//            ]);
+       // return redirect()->route('arena.host', ['arenaGame' => $arenaGame->id]);
+
+    }
+
+
+
+    public function startGame($quizId)
+    {
+        // Puedes hacer alguna validación o cambio de estado si hace falta
+
+        // Emitir el evento para que los jugadores escuchen
+        broadcast(new GameStarted($quizId));
+
+        return response()->json(['status' => 'started']);
+    }
+
+
+
+    public function hostQuestion($quizId)
+    {
+        $quiz = Quiz::with('quizQuestions.quizQuestionAnswers')->findOrFail($quizId);
+        $questions = $quiz->quizQuestions;
+
+        if ($questions->isEmpty()) {
+            return redirect()->route('quizzes.index')->with('error', 'No hay preguntas disponibles.');
+        }
+
+        // Obtener preguntas ya usadas desde sesión
+        $usedQuestions = Session::get('used_questions', []);
+
+        // Filtrar para obtener preguntas no usadas
+        $availableQuestions = $questions->whereNotIn('id', $usedQuestions);
+
+        if ($availableQuestions->isEmpty()) {
+            return redirect()->route('quizzes.index')->with('error', 'Ya se usaron todas las preguntas.');
+        }
+
+        // Seleccionar pregunta al azar de las no usadas
+        $question = $availableQuestions->random();
+
+        // Guardar ID como ya usado
+        Session::push('used_questions', $question->id);
+
+        // Mapear respuestas con letras
+        $letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+        $answers = $question->quizQuestionAnswers->values()->map(function ($a, $index) use ($letters) {
+            return [
+                'letter' => $letters[$index] ?? '?',
+                'answer_text' => $a->answer_text
+            ];
+        });
+
+        // Emitir evento
+        event(new \App\Events\ArenaQuestionSent($quizId, [
+            'question_text' => $question->question_text,
+            'question_id' => $question->id,
+            'answers' => $answers
+        ]));
+
+        return view('quizzes.host-question', compact('quiz'));
+    }
+
+
+
+
+
+    public function createArenaSession(Quiz $quiz)
+    {
+        Session::put('arena_mode.quiz_id', $quiz->id);
+        Session::put('arena_mode.players', []); // array de jugadores
+        Session::put('arena_mode.current_question_index', 0);
+        Session::put('arena_mode.responses', []);
+
+        return view('arena.host-lobby', compact('quiz'));
+    }
+
+    public function joinArena(Request $request)
+    {
+        $nickname = $request->input('nickname');
+        $quizId = $request->input('quiz_id');
+
+        $players = Session::get('arena_mode.players', []);
+        $players[] = ['nickname' => $nickname, 'score' => 0];
+        Session::put('arena_mode.players', $players);
+
+        broadcast(new PlayerJoined($quizId, $nickname));
+
+        return view('arena.waiting-room', compact('nickname', 'quizId'));
+    }
+
+    public function playArenaGame(Quiz $quiz)
+    {
+        $quiz->load('quizQuestions.quizQuestionAnswers', 'quizQuestions.type');
+
+        broadcast(new GameStarted($quiz));
+
+        return $this->nextArenaQuestion($quiz);
+    }
+
+    public function nextArenaQuestion(Quiz $quiz)
+    {
+        $index = Session::get('arena_mode.current_question_index', 0);
+        $questions = $quiz->quizQuestions;
+
+        if ($index >= $questions->count()) {
+            return $this->finishArenaGame($quiz);
+        }
+
+        $question = $questions[$index];
+        Session::put('arena_mode.current_question_index', $index + 1);
+
+        broadcast(new QuestionChanged($quiz->id, $question));
+
+        return view('arena.host-question', compact('question'));
+    }
+
+    public function submitArenaAnswer(Request $request)
+    {
+        $quizId = $request->input('quiz_id');
+        $questionId = $request->input('question_id');
+        $nickname = $request->input('nickname');
+        $answerId = $request->input('answer_id');
+
+        $quiz = Quiz::with('quizQuestions.quizQuestionAnswers')->findOrFail($quizId);
+        $question = $quiz->quizQuestions->firstWhere('id', $questionId);
+        $correct = $question->quizQuestionAnswers->where('is_correct', true)->first();
+
+        $isCorrect = $correct && $correct->id == $answerId;
+
+        $responses = Session::get('arena_mode.responses', []);
+        $responses[] = [
+            'nickname' => $nickname,
+            'question_id' => $questionId,
+            'correct' => $isCorrect,
+        ];
+        Session::put('arena_mode.responses', $responses);
+
+        broadcast(new CorrectAnswerShown($quiz->id, $questionId, $correct->id));
+
+        return response()->json(['correct' => $isCorrect]);
+    }
+
+    public function finishArenaGame(Quiz $quiz)
+    {
+        $responses = Session::get('arena_mode.responses', []);
+        $players = Session::get('arena_mode.players', []);
+
+        // Contar respuestas correctas por jugador
+        foreach ($players as &$player) {
+            $player['score'] = collect($responses)
+                    ->where('nickname', $player['nickname'])
+                    ->where('correct', true)
+                    ->count() * 100; // por ejemplo: 100 pts por acierto
+        }
+
+        // Ordenar por score
+        $ranking = collect($players)->sortByDesc('score')->values()->all();
+
+        broadcast(new GameFinished($quiz->id, $ranking));
+
+        return view('arena.podium', compact('ranking'));
+    }
+
+
+
 
 
 

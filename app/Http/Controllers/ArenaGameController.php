@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PlayerJoined;
+use App\Events\PlayerLeft;
 use App\Http\Requests\StoreArenaGameRequest;
 use App\Http\Requests\UpdateArenaGameRequest;
 use App\Models\ArenaGame;
+use App\Models\ArenaPlayer;
 use App\Models\GameHistory;
 use App\Models\UserPlan;
 use App\Services\UsageService;
@@ -13,6 +16,8 @@ use Illuminate\Http\Response;
 
 use App\Models\Quiz;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 class ArenaGameController extends Controller
 {
     /**
@@ -126,7 +131,7 @@ class ArenaGameController extends Controller
 
         $arenaModeUses = $uses['arena_mode']['remaining']?? 6;
 //        $studyModeUses = 0;
-        //      $arenaModeUses = 0;
+             $arenaModeUses = 50;
         //   $availableCreations=0;
 
 
@@ -157,4 +162,58 @@ class ArenaGameController extends Controller
             'planLimits'
         ));
     }
+
+    public function joinGame(Request $request)
+    {
+        $request->validate([
+            'player_name' => 'required|string|max:255',
+            'pin' => 'required|string|size:6',
+        ]);
+
+        $arenaGame = ArenaGame::where('pin', strtoupper($request->pin))
+            ->where('status', 'active')
+            ->first();
+
+        if (!$arenaGame) {
+            return redirect()->back()->withErrors(['pin' => 'Invalid or inactive game PIN.']);
+        }
+        $currentPlayersCount = ArenaPlayer::where('arena_game_id', $arenaGame->id)->count();
+
+        // Obtener el límite de jugadores desde el plan del host
+        $userPlan = $arenaGame->gameHistory->user->plan;
+        $maxPlayers = $userPlan ? $userPlan->max_arena_players : 0;
+
+        if ($maxPlayers > 0 && $currentPlayersCount >= $maxPlayers) {
+            // El juego está lleno, no permitir que más jugadores se unan
+            return redirect()->back()->withErrors(['pin' => 'The game is full. No more players can join.']);
+        }
+
+        // Registrar jugador (si manejas tabla de jugadores)
+        $player = ArenaPlayer::create([
+            'name' => $request->player_name,
+            'arena_game_id' => $arenaGame->id,
+            'user_id' => Auth::check() ? Auth::id() : null,
+        ]);
+       // $quizId = $arenaGame->gameHistory->quiz_id;
+        broadcast(new PlayerJoined($player, $arenaGame->id));
+
+
+        // Guardar datos en la sesión para el jugador
+        session([
+            'player_name' => $player->name,
+            'arena_player_id' => $player->id,
+            'arena_game_pin' => $arenaGame->pin,
+            'arena_game_id' => $arenaGame->id,
+        ]);
+
+        return view('quizzes.waiting', [
+            'player' => $player,
+            'arenaGameId' => $arenaGame->id,
+            'pin' => $arenaGame->pin,
+        ]);
+    }
+
+
+
+
 }

@@ -27,6 +27,18 @@ services:
             - meilisearch
             - mailpit
             - selenium
+            - soketi
+
+    soketi:
+        image: quay.io/soketi/soketi:latest-16-alpine  # Esta es la imagen oficial de Soketi
+        ports:
+            - "6001:6001"  # Puerto para WebSockets
+        environment:
+            - SOKETI_DEBUG=1  # Activar depuración
+        networks:
+            - sail
+        depends_on:
+            - redis  # Soketi depende de Redis
     mysql:
         image: 'mysql/mysql-server:8.0'
         ports:
