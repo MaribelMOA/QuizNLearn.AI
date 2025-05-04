@@ -8,6 +8,7 @@ use App\Events\PlayerJoined;
 use App\Events\QuestionChanged;
 use App\Http\Requests\StoreGameHistoryRequest;
 use App\Http\Requests\UpdateGameHistoryRequest;
+use App\Models\ArenaPlayer;
 use App\Models\GameHistory;
 use App\Models\Quiz;
 use App\Services\PlayModesService;
@@ -488,11 +489,25 @@ class GameHistoryController extends Controller
 
     public function startArenaGame(Quiz $quiz){
         $user = Auth::user();
+        // Obtener el plan del usuario (host)
 
-        // Obtener el plan del usuario (host)
-        // Obtener el plan del usuario (host)
-        $userPlan = $user->plan()->latest()->first();  // Obtener el último plan del usuario
-        $maxPlayers = $userPlan ? $userPlan->max_arena_players : 0;
+
+        // Verificar si ya existe un juego activo en sesión
+        if (Session::has('arena_game_id')) {
+            $arenaGameId = Session::get('arena_game_id');
+            $arenaGame = ArenaGame::find($arenaGameId);
+
+            if ($arenaGame && $arenaGame->status === 'active') {
+                return view('quizzes.host-lobby', [
+                    'quiz' => $quiz,
+                    'quizId' => $quiz->id,
+                    'pin' => $arenaGame->pin,
+                    'arenaGameId' => $arenaGame->id,
+                    'maxPlayers' => $this->getMaxPlayers($user),
+                ]);
+            }
+        }
+
 
         // Crear registro en game_histories
         $history = GameHistory::create([
@@ -518,13 +533,15 @@ class GameHistoryController extends Controller
         Session::put('game_mode', 'Arena');
         Session::put('game_pin', $pin);
         Session::put('used_questions', []);
+        Session::put('arena_game_id', $arenaGame->id); // 👉 Guardar ID en sesión
+        Session::put("game.$arenaGame->id.current_question", 1);
 
         Log::info('Arena game id'.$arenaGame->id);
         return view('quizzes.host-lobby', ['quiz' => $quiz,
             'quizId' => $quiz->id,
             'pin' => $pin,
             'arenaGameId' => $arenaGame->id,
-            'maxPlayers' => $maxPlayers,]);
+            'maxPlayers' =>  $this->getMaxPlayers($user),]);
 //        return view('quizzes.host-lobby', [
 //            'arenaGame' => $arenaGame
 //            ]);
@@ -532,17 +549,57 @@ class GameHistoryController extends Controller
 
     }
 
-
-
-    public function startGame($quizId)
+    private function getMaxPlayers($user)
     {
-        // Puedes hacer alguna validación o cambio de estado si hace falta
-
-        // Emitir el evento para que los jugadores escuchen
-        broadcast(new GameStarted($quizId));
-
-        return response()->json(['status' => 'started']);
+        $userPlan = $user->plan()->latest()->first();
+        return $userPlan ? $userPlan->max_arena_players : 0;
     }
+
+    public function showHostView($arenaGameId)
+    {
+        $arenaGame = ArenaGame::findOrFail($arenaGameId);  // Obtén el juego de la arena
+        $quiz = $arenaGame->gameHistory->quiz;
+
+        $players = ArenaPlayer::where('arena_game_id', $arenaGameId)->get();
+
+        // Reiniciar respuestas de todos los jugadores
+        foreach ($players as $player) {
+            $player->has_responded = false;
+            $player->save();
+        }
+        $questionNumber = Session::get("game.$arenaGameId.current_question", 1);
+        $question = $quiz->quizQuestions[$questionNumber - 1];
+
+        return view('quizzes.host-question', [
+            'quiz' => $quiz,
+            'question' => $question,
+            'questionNumber' => $questionNumber,
+            'totalQuestions' => $quiz->num_questions,
+            'timeLimit' => 20, // segundos
+            'playersAnswered' => Session::get("game.$arenaGame.players_answered", 0),
+            'totalPlayers' => Session::get("game.$arenaGame.total_players", 1),
+        ]);
+    }
+    public function nextQuestion($gameId)
+    {
+        $currentQuestion = Session::get("game.$gameId.current_question", 1);
+        Session::put("game.$gameId.current_question", $currentQuestion + 1);
+
+        // Lógica para continuar al siguiente jugador o siguiente pregunta
+    }
+    public function startGame($arenaGameId)
+    {
+        broadcast(new GameStarted($arenaGameId));
+        Log::info("se supone que hice el broadcast");
+       // return response()->json(['message' => 'Game started']);
+    }
+
+
+
+    //////////////////////////////////////////
+
+
+
 
 
 

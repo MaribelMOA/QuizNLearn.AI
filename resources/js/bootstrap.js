@@ -21,7 +21,7 @@ window.Echo = new Echo({
     key: import.meta.env.VITE_PUSHER_APP_KEY,  // Usa el valor de la clave de tu app Pusher del .env
     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,  // Usa el valor del clúster de tu app Pusher
     forceTLS: true,  // Si estás usando HTTPS en tu aplicación
-    disableStats: true,
+  //  disableStats: true,
     // broadcaster: 'pusher',
     // key: '',  // No necesitas usar el APP_KEY si estás usando Soketi, puedes usarlo como string vacío
     // wsHost: window.location.hostname,  // Configura el hostname de tu servidor

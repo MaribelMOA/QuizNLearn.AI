@@ -70,22 +70,34 @@ Route::middleware('auth')->group(function () {
 
 
 
-    Route::prefix('/quizzes/arena')->group(function () {
-      //  Route::get('/{quizId}/host-lobby', [GameHistoryController::class, 'hostLobby'])->name('quizzes.host-lobby');
-        Route::get('/{quizId}/host-question', [GameHistoryController::class, 'hostQuestion'])->name('quizzes.host-question');
-        Route::get('/{quizId}/waiting-room', [GameHistoryController::class, 'waitingRoom'])->name('quizzes.waiting-room');
-        Route::get('/{quizId}/podium', [GameHistoryController::class, 'podium'])->name('quizzes.podium');
-        Route::post('/{quizId}/start', [GameHistoryController::class, 'startGame'])->name('quizzes.start-game');
-
-    });
+//    Route::prefix('/quizzes/arena')->group(function () {
+//      //  Route::get('/{quizId}/host-lobby', [GameHistoryController::class, 'hostLobby'])->name('quizzes.host-lobby');
+//        Route::get('/{quizId}/host-question', [GameHistoryController::class, 'hostQuestion'])->name('quizzes.host-question');
+//        Route::get('/{quizId}/waiting-room', [GameHistoryController::class, 'waitingRoom'])->name('quizzes.waiting-room');
+//        Route::get('/{quizId}/podium', [GameHistoryController::class, 'podium'])->name('quizzes.podium');
+//        Route::post('/{quizId}/start', [GameHistoryController::class, 'startGame'])->name('quizzes.start-game');
+//
+//    });
    // Route::post('/{quizId}/start', [GameHistoryController::class, 'startGame'])->name('quizzes.start-game');
 
-    Route::post('/join-arena', [ArenaGameController::class, 'joinGame'])->name('arena.join');
 
+    //ENTRAR Y SALIR
+    Route::post('/join-arena', [ArenaGameController::class, 'joinGame'])->name('arena.join');
+    Route::post('/arena/{arena}/remove-player', [ArenaGameController::class, 'removePlayer']);
+
+    //LA VERDAD CREO QUE NOS E OCUPA
     Route::get('/arena/waiting', function () {
         return view('quizzes.waiting');
     })->name('arena.waiting');
 
+    //LANZAR EVENTO GAME STARTED
+    Route::post('/arena/{arenaGameId}/start-game', [GameHistoryController::class, 'startGame']);
+
+    //MOSTRR PREGUTNAS
+    Route::get('/arena/host/{arenaGameId}', [GameHistoryController::class, 'showHostView'])->name('arena.host.view');
+    Route::get('/arena/play/{arenaGameId}', [ArenaGameController::class, 'showPlayerView'])->name('arena.player.view');
+
+    Route::post('/arena/submit/{arenaGameId}', [ArenaGameController::class, 'submitPlayerAnswer'])->name('arena.player.submit');
 
     //Route::get('/play', [QuizController::class, 'play'])->name('features.index');
 

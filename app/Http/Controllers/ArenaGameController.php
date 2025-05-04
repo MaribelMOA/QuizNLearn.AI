@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PlayerAnswered;
 use App\Events\PlayerJoined;
-use App\Events\PlayerLeft;
+
 use App\Http\Requests\StoreArenaGameRequest;
 use App\Http\Requests\UpdateArenaGameRequest;
 use App\Models\ArenaGame;
 use App\Models\ArenaPlayer;
 use App\Models\GameHistory;
+use App\Models\QuizQuestion;
 use App\Models\UserPlan;
 use App\Services\UsageService;
 use Illuminate\Http\Request;
@@ -16,7 +18,9 @@ use Illuminate\Http\Response;
 
 use App\Models\Quiz;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class ArenaGameController extends Controller
 {
@@ -212,6 +216,88 @@ class ArenaGameController extends Controller
             'pin' => $arenaGame->pin,
         ]);
     }
+
+    public function removePlayer(Request $request, $arena)
+    {
+        Log::info('Intentando eliminar jugador', [
+            'arena_game_id' => $arena,
+            'id' => $request->input('user_id')
+        ]);
+
+        $userId = $request->input('user_id');
+
+        if (!$userId) {
+            return response()->json(['error' => 'user_id no enviado'], 400);
+        }
+
+        DB::table('arena_players')
+            ->where('arena_game_id', $arena)
+            ->where('id', $userId)
+            ->delete();
+
+        return response()->json(['status' => 'ok']);
+    }
+
+    public function showPlayerView($arenaGameId)
+    {
+        $arenaGame = ArenaGame::findOrFail($arenaGameId);  // Obtén el juego de la arena
+        $quiz = $arenaGame->gameHistory->quiz;
+
+        // Obtén el número de pregunta de la sesión o de la base de datos
+        $player = ArenaPlayer::where('arena_game_id', $arenaGameId)->where('user_id', Auth::id())->first();
+        $questionNumber = $player->current_question;
+
+        // Obtén la pregunta actual
+        $question = $quiz->quizQuestions[$questionNumber - 1];
+
+        return view('quizzes.player-answer',[
+            'quiz' => $quiz,
+            'question' => $question,
+            'questionNumber' => $questionNumber,
+            'totalQuestions' => $quiz->num_questions,
+            'playerScore' => $player->score,
+            'timeLimit' => 20,  // Tiempo límite para responder
+        ]);
+    }
+
+    public function submitPlayerAnswer(Request $request, $gameId)
+    {
+        // Validar la respuesta
+        $request->validate([
+            'question_id' => 'required|exists:quiz_questions,id',
+            'answer' => 'required|exists:quiz_question_answers,id',
+        ]);
+
+        $player = ArenaPlayer::where('arena_game_id', $gameId)->where('user_id', Auth::id())->first();
+        $question = QuizQuestion::findOrFail($request->question_id);
+        $correctAnswer = $question->quizQuestionAnswers->where('is_correct', true)->first();
+
+        // Verificar si la respuesta es correcta
+        $correct = ($correctAnswer && $correctAnswer->id == $request->answer);
+        $points = $correct ? 100 : 0;  // Si es correcta, asigna puntos
+
+        // Actualizar el puntaje del jugador
+        $player->score += $points;
+        $player->has_responded = true;
+        $player->last_answered_question_id = $question->id;
+        $player->save();
+
+        // Emitir el evento de que el jugador ha respondido
+        event(new PlayerAnswered($gameId, $player->id));
+
+        // Incrementar el número de la pregunta
+        $player->current_question += 1;
+        $player->save();
+
+        // Comprobar si todos los jugadores han respondido o si el tiempo se agotó
+        $this->checkAllAnswered($gameId);
+
+        // Redirigir o mostrar la vista
+        return redirect()->route('game.player.view', $gameId);
+    }
+
+
+
 
 
 
