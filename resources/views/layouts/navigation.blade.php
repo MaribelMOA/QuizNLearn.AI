@@ -27,7 +27,7 @@
                         {{ __('Summary List') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('features.index')" :active="request()->routeIs('features.*')" class="hover:text-blue-500 text-lg">
+                    <x-nav-link :href="route('xp.store')" :active="request()->routeIs('features.*')" class="hover:text-blue-500 text-lg">
                         <i class="fas fa-store mr-1"></i>
                         {{ __('Shop') }}
                     </x-nav-link>
@@ -103,7 +103,7 @@
                 <i class="fas fa-book-open mr-1 text-primary"></i> {{ __('Summaries') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('features.index')" :active="request()->routeIs('features.*')" class="hover:text-blue-500">
+            <x-responsive-nav-link :href="route('xp.store')" :active="request()->routeIs('features.*')" class="hover:text-blue-500">
                 <i class="fas fa-store mr-1 text-primary"></i> {{ __('Shop') }}
             </x-responsive-nav-link>
         </div>

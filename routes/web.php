@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\GameHistoryController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StoreController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FeatureController;
 use App\Http\Controllers\XpPriceController;
@@ -98,6 +99,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/arena/play/{arenaGameId}', [ArenaGameController::class, 'showPlayerView'])->name('arena.player.view');
 
     Route::post('/arena/submit/{arenaGameId}', [ArenaGameController::class, 'submitPlayerAnswer'])->name('arena.player.submit');
+
+
+
+    ///ME RENID, ENTONCES ESTOE S LO DE SHOP:
+    Route::get('/xp-store', [StoreController::class, 'index'])->name('xp.store');
+    Route::post('/xp-store/purchase-feature', [StoreController::class, 'purchaseFeature'])->name('xp.purchaseFeature');
+    Route::post('/xp-store/purchase-package', [StoreController::class, 'purchasePackage'])->name('xp.purchasePackage');
 
     //Route::get('/play', [QuizController::class, 'play'])->name('features.index');
 
