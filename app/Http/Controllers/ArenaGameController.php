@@ -539,9 +539,25 @@ class ArenaGameController extends Controller
                 'is_correct' => $answer->is_correct,
             ];
         });
+        $responses = $arenaGame->players()
+            ->where('is_host', false)
+            ->where('last_answered_question_id', $question->id)
+            ->with('lastSelectedAnswer')
+            ->get();
+
+        // Contar cuántos escogieron cada respuesta
+        $answerCounts = $responses->groupBy('last_selected_answer_id')->map->count();
+        $answerCounts = $answerCounts ?? collect(); // Garantiza que no sea null
+
+        // Obtener respuesta correcta
+        $correctAnswer = $question->quizQuestionAnswers()->where('is_correct', true)->first();
 
         // Ranking global
-        $ranking = $playersWithAnswers->sortByDesc('total_score')->values();
+        $ranking = $arenaGame->players()
+            ->where('is_host', false)
+            ->orderByDesc('score')
+            ->get();
+       // $ranking = $playersWithAnswers->sortByDesc('total_score')->values();
         Log::info('Ranking generated', ['ranking' => $ranking->toArray()]);
 
 
@@ -557,6 +573,8 @@ class ArenaGameController extends Controller
             'playersWithScores' => $playersWithAnswers,
             'ranking' => $ranking,
             'score' => $score,
+            'responses' => $responses,
+            'answerCounts' => $answerCounts,
         ]);
     }
     public function getCurrentQuestion(ArenaPlayer $player)
