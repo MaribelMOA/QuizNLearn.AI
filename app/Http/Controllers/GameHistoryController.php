@@ -429,7 +429,11 @@ class GameHistoryController extends Controller
 
         // 👉 Guardar en GameHistory
         $user = Auth::user();
-        $score = $xpGained; // o usa otra lógica si tienes un score separado
+
+        $user->xp += $xpGained;
+        $user->save();
+
+       // $score = $xpGained; // o usa otra lógica si tienes un score separado
         $mode = 'Study'; // o usa el valor real si lo pasas por otro lado
 
         $gameHistory = GameHistory::create([

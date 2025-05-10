@@ -263,11 +263,13 @@ class QuizController extends Controller
 
         if (is_null($content) || trim($content) === '') {
             Log::error("No content found for quiz generation (session).");
+            $quiz->delete();
             return response()->json(['status' => 'error', 'message' => 'No content available for generation.'], 400);
         }
 
         if (empty($questionTypes)) {
             Log::error("Missing question types in session");
+            $quiz->delete();
             throw new \Exception('No question types provided for distribution.');
         }
 
@@ -289,6 +291,7 @@ class QuizController extends Controller
 
         if (!$success) {
             Log::error("Failed to generate and store quiz properly.");
+            $quiz->delete();
             return response()->json(['success' => false, 'message' => 'Error generating and saving the quiz.'], 500);
         }
 
