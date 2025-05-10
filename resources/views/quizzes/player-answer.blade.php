@@ -129,7 +129,35 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+
+            const arenaId = {{ $arenaGameId }};
+            const questionId = {{ $question->id }};
+
+
+            const interval = setInterval(() => {
+            fetch(`/arena/${arenaId}/question/${questionId}/check-status`)
+                .then(res => res.json())
+                .then(data => {
+                    console.log("Polling result:", data);
+
+                    if (data.status === 'finished') {
+                        clearInterval(interval);
+                        Swal.fire({
+                            title: 'Game Over!',
+                            text: 'Thanks for playing!',
+                            icon: 'info',
+                            confirmButtonText: 'OK',
+                        }).then(() => {
+                            window.location.href = "{{ route('quizzes.index') }}";
+
+                        });
+                    }
+
+                });
+        }, 3000);
+
+
+    document.addEventListener('DOMContentLoaded', function() {
             // Timer functionality
             const countdownElement = document.getElementById('countdown');
             const timerCircle = document.getElementById('timer-circle');
@@ -206,59 +234,6 @@
 
 
         });
-        //NORMAL MODE FOR TIMER
-        {{--let timeLeft = {{ $timeLimit }};--}}
-        {{--const countdownEl = document.getElementById('countdown');--}}
-        {{--const form = document.getElementById('answer-form');--}}
 
-        {{--const interval = setInterval(() => {--}}
-        {{--    timeLeft--;--}}
-        {{--    countdownEl.textContent = timeLeft;--}}
-
-        {{--    if (timeLeft <= 0) {--}}
-        {{--        clearInterval(interval);--}}
-        {{--        form.submit(); // Autoenvía si el tiempo acaba--}}
-        {{--    }--}}
-        {{--}, 1000);--}}
-
-
-        //////////NOT SURE WHAT THIS IS
-        {{--let countdown = {{ $questionTime }};--}}
-        {{--const interval = setInterval(() => {--}}
-        {{--    countdown--;--}}
-        {{--    document.getElementById('countdown').innerText = countdown;--}}
-        {{--    if (countdown <= 0) {--}}
-        {{--        clearInterval(interval);--}}
-        {{--        document.getElementById('answer-form').querySelector('button').disabled = true;--}}
-        {{--    }--}}
-        {{--}, 1000);--}}
-
-        {{--document.getElementById('answer-form').addEventListener('submit', function (e) {--}}
-        {{--    e.preventDefault();--}}
-
-        {{--    const formData = new FormData(this);--}}
-        {{--    fetch('{{ route('arena.player.submit', ['arenaGameId' => $arenaGameId]) }}', {--}}
-        {{--        method: 'POST',--}}
-        {{--        headers: {--}}
-        {{--            'X-CSRF-TOKEN': '{{ csrf_token() }}'--}}
-        {{--        },--}}
-        {{--        body: formData--}}
-        {{--    })--}}
-        {{--        .then(res => res.json())--}}
-        {{--        .then(data => {--}}
-        {{--            if (data.success) {--}}
-        {{--                document.getElementById('feedback').innerHTML = data.feedback;--}}
-        {{--                document.getElementById('answer-form').querySelector('button').disabled = true;--}}
-        {{--            } else {--}}
-        {{--                document.getElementById('feedback').innerHTML = 'Error al enviar respuesta.';--}}
-        {{--            }--}}
-        {{--        });--}}
-        {{--});--}}
-
-        {{--// Eliminar mensaje de espera cuando llega la pregunta--}}
-        {{--Echo.join(`arena.{{ $arenaGameId }}`)--}}
-        {{--    .listen('.new.question', (e) => {--}}
-        {{--        window.location.reload(); // O mejor, renderiza la pregunta sin recargar--}}
-        {{--    });--}}
     </script>
 </x-app-layout>

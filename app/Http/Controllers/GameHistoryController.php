@@ -815,9 +815,12 @@ class GameHistoryController extends Controller
             $end = \Carbon\Carbon::parse($arenaGameId->end_time);
 
 
-            $totalSeconds = $start ? $start->diffInSeconds($end) : 0;
+            //$totalSeconds = $start ? $start->diffInSeconds($end) : 0;
+            $totalSeconds = round($start->diffInRealSeconds($end));
+
+            Log::info("Total secods".$totalSeconds);
             $arenaGameId->gameHistory->update([
-                'total_time' => $totalSeconds
+                'total_time_seconds' => $totalSeconds
             ]);
         }
 
@@ -834,95 +837,32 @@ class GameHistoryController extends Controller
     }
 
 
-//    public function nextQuestion($arenaGameId, $questionId)
-//    {
-//        $arenaGame = ArenaGame::findOrFail($arenaGameId);
-//        $quiz = $arenaGame->gameHistory->quiz;
-//
-//        // Obtener todas las preguntas ordenadas
-//        $questions = QuizQuestion::where('quiz_id', $quiz->id)->orderBy('id')->get()->values();
-//
-//        // Buscar el índice de la pregunta actual
-//        $currentIndex = $questions->search(function ($q) use ($questionId) {
-//            return $q->id == $questionId;
-//        });
-//
-//        if ($currentIndex === false || !isset($questions[$currentIndex + 1])) {
-//            // No hay siguiente pregunta → ir al resumen de resultados
-//            return redirect()->route('quizzes.results', ['arenaGameId' => $arenaGameId]);
-//        }
-//
-//        $nextQuestion = $questions[$currentIndex + 1];
-//        $nextQuestionNumber = $currentIndex + 2; // +1 por índice base 0, +1 por siguiente
-//
-//        // Actualizar el número de pregunta en la sesión del host
-//        Session::put("game.$arenaGameId.current_question", $nextQuestionNumber);
-//
-//        // Reiniciar el estado de los jugadores
-//        $players = ArenaPlayer::where('arena_game_id', $arenaGameId)->get();
-//        foreach ($players as $player) {
-//            $player->last_answered_question_id = $player->current_question;
-//            $player->has_responded = false;
-//            $player->current_question = $nextQuestionNumber;
-//            $player->last_selected_answer_id = null;
-//            $player->question_started_at = now();
-//            $player->save();
-//        }
-//
-//        // Redirigir al host a la vista de la siguiente pregunta
-//        return redirect()->route('quizzes.host-view', [
-//            'arenaGameId' => $arenaGameId,
-//            'questionId' => $nextQuestion->id,
-//        ]);
-//    }
-
-
-
-
 
     //////////////////////////////////////////
 
 
 
-    public function nextArenaQuestion(Quiz $quiz)
-    {
-        $index = Session::get('arena_mode.current_question_index', 0);
-        $questions = $quiz->quizQuestions;
 
-        if ($index >= $questions->count()) {
-            return $this->finishArenaGame($quiz);
-        }
-
-        $question = $questions[$index];
-        Session::put('arena_mode.current_question_index', $index + 1);
-
-        broadcast(new QuestionChanged($quiz->id, $question));
-
-        return view('arena.host-question', compact('question'));
-    }
-
-
-
-    public function finishArenaGame(Quiz $quiz)
-    {
-        $responses = Session::get('arena_mode.responses', []);
-        $players = Session::get('arena_mode.players', []);
-
-        // Contar respuestas correctas por jugador
-        foreach ($players as &$player) {
-            $player['score'] = collect($responses)
-                    ->where('nickname', $player['nickname'])
-                    ->where('correct', true)
-                    ->count() * 100; // por ejemplo: 100 pts por acierto
-        }
-
-        // Ordenar por score
-        $ranking = collect($players)->sortByDesc('score')->values()->all();
-
-        broadcast(new GameFinished($quiz->id, $ranking));
-
-        return view('arena.podium', compact('ranking'));
-    }
+//    public function finishArenaGame(Quiz $quiz)
+//    {
+//        $responses = Session::get('arena_mode.responses', []);
+//        $players = Session::get('arena_mode.players', []);
+//
+//        // Contar respuestas correctas por jugador
+//        foreach ($players as &$player) {
+//            $player['score'] = collect($responses)
+//                    ->where('nickname', $player['nickname'])
+//                    ->where('correct', true)
+//                    ->count() * 100; // por ejemplo: 100 pts por acierto
+//        }
+//
+//        // Ordenar por score
+//        $ranking = collect($players)->sortByDesc('score')->values()->all();
+//
+//        broadcast(new GameFinished($quiz->id, $ranking));
+//
+//        return view('arena.podium', compact('ranking'));
+//    }
 
 
 

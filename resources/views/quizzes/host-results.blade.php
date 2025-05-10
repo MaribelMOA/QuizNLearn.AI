@@ -109,6 +109,7 @@
                     <div class="p-4">
                         <div class="space-y-3 max-h-96 overflow-y-auto pr-2">
                             @foreach($ranking as $index => $player)
+                                @if(!$isLastQuestion || $index < 3)
                                 @php
                                     $rankClass = '';
                                     $medalIcon = '';
@@ -154,6 +155,8 @@
                                         @endif
                                     </div>
                                 </div>
+                                @endif
+
                             @endforeach
                         </div>
                     </div>
