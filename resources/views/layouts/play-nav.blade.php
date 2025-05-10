@@ -38,14 +38,24 @@
 
                 // Solo enviar petición si es Study o Arena
                 if (mode === 'Study' || mode === 'Arena' && quizId) {
-                    axios.post(`/quizzes/play/exit/${quizId}`, {
-                        mode: mode
-                    }).then(() => {
-
-                        window.location.href = "{{ route('quizzes.index') }}";
-                    }).catch(() => {
-                        Swal.fire('Oops', 'An error occurred while exiting.', 'error');
-                    });
+                    if (mode === 'Arena') {
+                        const arenaGameId = "{{ session('arena_game_id') }}";
+                        axios.post(`/arena/${arenaGameId}/finish-game`)
+                            .then(() => {
+                                window.location.href = "{{ route('quizzes.index') }}";
+                            })
+                            .catch(() => {
+                                Swal.fire('Oops', 'An error occurred while exiting Arena mode.', 'error');
+                            });
+                    } else {
+                        axios.post(`/quizzes/play/exit/${quizId}`, {
+                            mode: mode
+                        }).then(() => {
+                            window.location.href = "{{ route('quizzes.index') }}";
+                        }).catch(() => {
+                            Swal.fire('Oops', 'An error occurred while exiting.', 'error');
+                        });
+                    }
                 } else {
                     // Si es Quiz mode, solo redirige sin guardar
                     window.location.href = "{{ route('quizzes.index') }}";

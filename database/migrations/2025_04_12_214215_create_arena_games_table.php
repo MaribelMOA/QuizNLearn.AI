@@ -17,7 +17,9 @@ return new class extends Migration
             $table->string('pin', 8);
             $table->timestamp('start_time')->useCurrent();
             $table->timestamp('end_time')->nullable();
-            $table->enum('status', ['active', 'finished'])->default('active');
+            $table->enum('status', ['active', 'started','finished'])->default('active');
+          //  $table->enum('status', ['active', 'finished'])->default('active');
+
             $table->integer('players_connected')->default(0);
 
             $table->timestamps();

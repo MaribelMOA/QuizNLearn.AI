@@ -47,6 +47,10 @@ class StoreController extends Controller
     {
         $package = XpPrice::findOrFail($request->xp_price_id);
         $user = auth()->user();
+        // Verificar si el usuario tiene un método de pago válido
+        if (is_null($user->payment_method_id) || $user->payment_method_id === 'simulation_payment_id') {
+            return back()->with('missing_payment', true);
+        }
 
         // Aquí debería integrarse con Stripe u otro método de pago.
         // Simulación de compra directa (sólo para pruebas):

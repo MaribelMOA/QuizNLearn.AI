@@ -18,8 +18,11 @@ return new class extends Migration
             $table->foreignId('arena_game_id')->constrained()->onDelete('cascade');
             $table->integer('score')->default(0);  // Puntaje del jugador
             $table->integer('current_question')->default(1);  // Pregunta actual que está respondiendo
+            $table->timestamp('question_started_at')->nullable(); // Nuevo campo
+            $table->foreignId('last_selected_answer_id')->nullable()->constrained('quiz_answers')->onDelete('set null');
             $table->foreignId('last_answered_question_id')->nullable()->constrained('quiz_questions');  // Última pregunta respondida
             $table->boolean('has_responded')->default(false);
+            $table->boolean('is_host')->default(false);
             $table->timestamps();
         });
     }

@@ -101,7 +101,7 @@ class QuizController extends Controller
         $studyModeUses = $uses['study_mode']['remaining']?? 5;
         $arenaModeUses = $uses['arena_mode']['remaining']?? 6;
 //        $studyModeUses = 0;
-        $arenaModeUses = 50;
+     //   $arenaModeUses = 50;
      //   $availableCreations=0;
 
 

@@ -23,4 +23,8 @@ class ArenaGame extends Model
     {
         return $this->belongsTo(GameHistory::class);
     }
+    public function players()
+    {
+        return $this->hasMany(ArenaPlayer::class);
+    }
 }

@@ -23,6 +23,10 @@ class QuizQuestion extends Model
     {
         return $this->hasMany(QuizAnswer::class, 'question_id');
     }
+    public function answers()
+    {
+        return $this->hasMany(QuizAnswer::class, 'question_id');
+    }
 
     // app/Models/QuizQuestion.php
     public function type()

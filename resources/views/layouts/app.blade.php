@@ -19,14 +19,21 @@
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-
-
-            @if (empty($hideNavigation))
+            @if (!empty($isArenaPlayer))
+                @include('layouts.player-arena-nav')
+            @elseif (empty($hideNavigation))
                 @include('layouts.navigation')
             @else
-                {{-- Puedes aquí poner otra cosa si quieres, como otra navegación especial --}}
                 @include('layouts.play-nav')
             @endif
+
+
+            {{--            @if (empty($hideNavigation))--}}
+{{--                @include('layouts.navigation')--}}
+{{--            @else--}}
+{{--                --}}{{-- Puedes aquí poner otra cosa si quieres, como otra navegación especial --}}
+{{--                @include('layouts.play-nav')--}}
+{{--            @endif--}}
 
             <!-- Page Heading -->
             @isset($header)

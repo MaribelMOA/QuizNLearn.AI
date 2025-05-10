@@ -3,6 +3,7 @@
 use App\Http\Controllers\GameHistoryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StoreController;
+use App\Models\ArenaPlayer;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FeatureController;
 use App\Http\Controllers\XpPriceController;
@@ -70,37 +71,64 @@ Route::middleware('auth')->group(function () {
     Route::get('/quizzes/arena/start/{quiz}', [GameHistoryController::class, 'startArenaGame'])->name('arena.startQuiz');
 
 
-
-//    Route::prefix('/quizzes/arena')->group(function () {
-//      //  Route::get('/{quizId}/host-lobby', [GameHistoryController::class, 'hostLobby'])->name('quizzes.host-lobby');
-//        Route::get('/{quizId}/host-question', [GameHistoryController::class, 'hostQuestion'])->name('quizzes.host-question');
-//        Route::get('/{quizId}/waiting-room', [GameHistoryController::class, 'waitingRoom'])->name('quizzes.waiting-room');
-//        Route::get('/{quizId}/podium', [GameHistoryController::class, 'podium'])->name('quizzes.podium');
-//        Route::post('/{quizId}/start', [GameHistoryController::class, 'startGame'])->name('quizzes.start-game');
-//
-//    });
-   // Route::post('/{quizId}/start', [GameHistoryController::class, 'startGame'])->name('quizzes.start-game');
-
-
     //ENTRAR Y SALIR
     Route::post('/join-arena', [ArenaGameController::class, 'joinGame'])->name('arena.join');
-    Route::post('/arena/{arena}/remove-player', [ArenaGameController::class, 'removePlayer']);
+    Route::post('/arena/{arena}/remove-player', [ArenaGameController::class, 'removePlayer'])->name('arena.removePlayer');
 
     //LA VERDAD CREO QUE NOS E OCUPA
     Route::get('/arena/waiting', function () {
         return view('quizzes.waiting');
     })->name('arena.waiting');
 
+    ////POLLING ARENA:
+
     //LANZAR EVENTO GAME STARTED
     Route::post('/arena/{arenaGameId}/start-game', [GameHistoryController::class, 'startGame']);
+    // Devuelve lista de jugadores
+
+    Route::get('/arena/{id}/players', function ($id) {
+        $players = ArenaPlayer::with('user')
+            ->where('arena_game_id', $id)
+            ->where('is_host', false)
+            ->get();
+
+        return response()->json([
+            'players' => $players->map(fn($p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'user' => $p->user?->only(['id', 'name', 'email']),
+            ])
+        ]);
+    });
+
+// Devuelve estado del juego
+    Route::get('/arena/{id}/status', function ($id) {
+        $arena = \App\Models\ArenaGame::findOrFail($id);
+        return response()->json(['status' => $arena->status]);
+    });
 
     //MOSTRR PREGUTNAS
     Route::get('/arena/host/{arenaGameId}', [GameHistoryController::class, 'showHostView'])->name('arena.host.view');
     Route::get('/arena/play/{arenaGameId}', [ArenaGameController::class, 'showPlayerView'])->name('arena.player.view');
 
-    Route::post('/arena/submit/{arenaGameId}', [ArenaGameController::class, 'submitPlayerAnswer'])->name('arena.player.submit');
+    //HOST
+    Route::get('/arena/{arena}/question-status', [GameHistoryController::class, 'checkQuestionStatus']);
+    Route::get('/arena/{arena}/question-summary', [GameHistoryController::class, 'questionSummary']);
 
+    Route::post('/arena/{arenaGame}/next-question/{question}', [GameHistoryController::class, 'nextQuestion'])->name('arena.next-question');
+    Route::post('/arena/{arenaGameId}/finish-game', [GameHistoryController::class, 'finishGame'])->name('arena.finish_game');
 
+    //PALYERS
+
+    Route::get('/arena/{arenaGameId}/players-answered', [ArenaGameController::class, 'playersAnsweredCount']);
+    Route::get('/arena/{arenaGame}/question/{question}/result/{score}', [ArenaGameController::class, 'showQuestionResult'])->name('arena.show_question_result');
+    // web.php
+    Route::get('/arena/{arenaGame}/question/{question}/check-status', [ArenaGameController::class, 'checkResultStatus'])->name('arena.check_result_status');
+
+    Route::get('/arena/{player}/current-question', [ArenaGameController::class, 'getCurrentQuestion']);
+
+    Route::post('/arena/{arenaGame}/update-answer', [ArenaGameController::class, 'updatePlayerAnswer'])
+        ->name('arena.update_player_answer');
 
     ///ME RENID, ENTONCES ESTOE S LO DE SHOP:
     Route::get('/xp-store', [StoreController::class, 'index'])->name('xp.store');

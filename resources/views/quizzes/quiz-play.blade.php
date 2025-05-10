@@ -60,7 +60,7 @@
                                 @endforeach
                             </div>
                         @elseif ($question->type->name === 'open_question')
-                            <textarea name="answers[{{ $question->id }}]" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" rows="3" placeholder="Your answer..." required"></textarea>
+                            <textarea name="answers[{{ $question->id }}]" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" rows="3" placeholder="Your answer..." required ></textarea>
                         @endif
                     </div>
                 @endforeach
@@ -104,8 +104,8 @@
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, salir',
-                cancelButtonText: 'Cancelar'
+                confirmButtonText: 'Yes, exit',
+                cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.location.href = "{{ route('quizzes.index') }}";
