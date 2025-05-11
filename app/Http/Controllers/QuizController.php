@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreQuizRequest;
 use App\Http\Requests\UpdateQuizRequest;
 use App\Models\Quiz;
-use App\models\GameHistory;
+use App\Models\GameHistory;
 use App\Models\QuizCreation;
 use App\Models\Summary;
 use App\Models\UserPlan;
