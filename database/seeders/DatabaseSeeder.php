@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
 //        ]);
 
         $this->call([
-        PlanTypeSeeder::class,
+        PlanSeeder::class,
         QuestionTypeSeeder::class,
         FeatureTypeSeeder::class,
         XpPriceSeeder::class,
