@@ -34,15 +34,16 @@ Route::middleware('auth')->group(function () {
     Route::resource('quizzes', QuizController::class);
     Route::post('/quizzes/{quiz}/process', [QuizController::class, 'process'])->name('quizzes.process');
     Route::get('/quizzes/{quiz}/details', [QuizController::class, 'details'])->name('quizzes.details');
-
-
-
-
-
     Route::get('/download-quiz/{quiz_id}', [QuizController::class, 'downloadQuizAsPdf'])->name('quiz.downloadPdf');
 
 
     Route::resource('summaries', SummaryController::class);
+    Route::post('/summaries/{summary}/process', [SummaryController::class, 'process'])->name('summaries.process');
+    Route::get('/summaries/{summary}/details', [SummaryController::class, 'details'])->name('summaries.details');
+
+    Route::get('/download-summary/{summary_id}', [SummaryController::class, 'downloadSummaryAsPdf'])->name('summaries.downloadPdf');
+
+
     Route::resource('arena', ArenaGameController::class);
 
     Route::post('/validate-url', [UrlValidationController::class, 'validate']);

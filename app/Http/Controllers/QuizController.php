@@ -237,6 +237,7 @@ class QuizController extends Controller
 
         if (is_null($content) || trim($content) === '') {
             Log::error("generateWithGemini: Content is empty or null");
+            $quiz->delete();
             throw new \InvalidArgumentException('No content provided for quiz generation.');
         }
 

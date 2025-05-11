@@ -449,6 +449,7 @@ EOT;
     // Función para generar el contenido HTML del PDF
     public static function generatePdfContent($data)
     {
+
         // Obtener los datos del quiz
         $quiz = $data['quiz'];
 
@@ -508,6 +509,41 @@ EOT;
         return $content;
     }
 
+
+    ////////
+    public static function generateSummaryPdfContent($summary)
+    {
+        $user = $summary->user; // Relación con el usuario
+        $date = now()->format('d/m/Y');
+
+        $content = "
+    <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; padding: 40px; }
+                .header { text-align: center; margin-bottom: 40px; }
+                .info { margin-bottom: 30px; }
+                .info p { margin: 5px 0; }
+                .summary-content { white-space: pre-wrap; text-align: justify; }
+            </style>
+        </head>
+        <body>
+            <div class='header'>
+                <h1>{$summary->title}</h1>
+            </div>
+            <div class='info'>
+                <p><strong>Name:</strong> {$user->name}</p>
+                <p><strong>Date:</strong> {$date}</p>
+            </div>
+            <div class='summary-content'>
+    " . nl2br(e(trim($summary->content))) . "
+</div>
+
+        </body>
+    </html>";
+
+        return $content;
+    }
 
 
 

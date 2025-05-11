@@ -225,9 +225,9 @@
                         </svg>
                         <h3 class="text-lg font-medium text-gray-900 mb-2">No quizzes found</h3>
                         <p class="text-gray-500 mb-4">You haven't created any quizzes yet or none match your search criteria.</p>
-                        <a href="{{ route('quizzes.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                            Create Your First Quiz
-                        </a>
+{{--                        <a href="{{ route('quizzes.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">--}}
+{{--                            Create Your First Quiz--}}
+{{--                        </a>--}}
                     </div>
                 @endforelse
             </div>
