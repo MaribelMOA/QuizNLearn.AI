@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
         PlanSeeder::class,
         QuestionTypeSeeder::class,
         FeatureTypeSeeder::class,
+        FeatureSeeder::class,
         XpPriceSeeder::class,
     ]);
 
