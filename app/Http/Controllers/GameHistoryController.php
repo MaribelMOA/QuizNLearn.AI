@@ -162,10 +162,10 @@ class GameHistoryController extends Controller
             $correctAnswer = $question->quizQuestionAnswers->where('is_correct', true)->first();
 
             if ($correctAnswer) {
-                Log::info("Enteres correct anwser");
+              //  Log::info("Enteres correct anwser");
                 // Si la respuesta es de texto (en lugar de opción múltiple), normalizamos y comparamos
                 if ($question->type->name === 'open_question') {
-                    Log::info("Open question detected. Verifying with AI...");
+                   // Log::info("Open question detected. Verifying with AI...");
                     // Normalizamos las respuestas antes de compararlas
                     $normalizedUserAnswer = strtolower(trim($userAnswer));
                     $normalizedCorrectAnswer = strtolower(trim($correctAnswer->answer));
@@ -175,7 +175,7 @@ class GameHistoryController extends Controller
                         $correctAnswersCount++;
                         $aiValidations[$question->id] = true;
                     } else {
-                        Log::info("AI verification needed.");
+                      //  Log::info("AI verification needed.");
                         // Verificamos con la IA
                         $isAIValid = PlayModesService::verifyOpenQuestionWithAI($question->question_text, $normalizedUserAnswer, $normalizedCorrectAnswer);
 
@@ -254,7 +254,7 @@ class GameHistoryController extends Controller
 
     public function showQuizResults()
     {
-        Log::info("Enteres sho quiz results");
+      //  Log::info("Enteres sho quiz results");
         // Recuperar los resultados de la sesión
         $quizResults = session('quizResults');
 
@@ -318,11 +318,11 @@ class GameHistoryController extends Controller
 
         $nextQuestion = $quiz->quizQuestions->firstWhere('id', $nextQuestionId);
 
-        Log::info('Modo estudio - siguiente pregunta', [
-            'quiz_id' => $quiz->id,
-            'next_question_id' => $nextQuestionId,
-            'answered_count' => count($answered),
-        ]);
+//        Log::info('Modo estudio - siguiente pregunta', [
+//            'quiz_id' => $quiz->id,
+//            'next_question_id' => $nextQuestionId,
+//            'answered_count' => count($answered),
+//        ]);
 
         $startTime = Session::get('study_mode.start_time');
         $elapsedSeconds = now()->diffInSeconds($startTime);
@@ -558,7 +558,7 @@ class GameHistoryController extends Controller
         Session::put('arena_game_id', $arenaGame->id); // 👉 Guardar ID en sesión
         Session::put("game.$arenaGame->id.current_question", $firstQuestion->id);
 
-        Log::info('Arena game id'.$arenaGame->id);
+      //  Log::info('Arena game id'.$arenaGame->id);
         return view('quizzes.host-lobby', ['quiz' => $quiz,
             'quizId' => $quiz->id,
             'pin' => $pin,
@@ -630,7 +630,7 @@ class GameHistoryController extends Controller
         $arenaGame->save();
         broadcast(new GameStarted($arenaGameId));
 
-        Log::info("se supone que hice el broadcast");
+     //   Log::info("se supone que hice el broadcast");
        // return response()->json(['message' => 'Game started']);
     }
     public function checkQuestionStatus(ArenaGame $arena)
@@ -660,25 +660,25 @@ class GameHistoryController extends Controller
         $quizId = $arena->gameHistory->quiz_id;
 
 
-        Log::info("=== DEBUG: HOST Player Info ===", [
-            'host_player_id' => $hostPlayer->id,
-            'current_question' => $questionId,
-        ]);
+//        Log::info("=== DEBUG: HOST Player Info ===", [
+//            'host_player_id' => $hostPlayer->id,
+//            'current_question' => $questionId,
+//        ]);
 
 
         $question = QuizQuestion::with('quizQuestionAnswers')->find($questionId);
-        Log::info("=== DEBUG: Arena info ===", [
-            'arena_id' => $arena->id,
-            'arena_quiz_id' => $arena->quiz_id,
-        ]);
+//        Log::info("=== DEBUG: Arena info ===", [
+//            'arena_id' => $arena->id,
+//            'arena_quiz_id' => $arena->quiz_id,
+//        ]);
 
         $questions = QuizQuestion::where('quiz_id', $quizId)->orderBy('id')->get()->values();
 
 
-        Log::info("=== DEBUG: Questions info ===", [
-            'question_ids' => $questions->pluck('id'),
-            'questions_count' => $questions->count(),
-        ]);
+//        Log::info("=== DEBUG: Questions info ===", [
+//            'question_ids' => $questions->pluck('id'),
+//            'questions_count' => $questions->count(),
+//        ]);
 
         $quizId = $arena->gameHistory->quiz_id;
 
@@ -702,21 +702,21 @@ class GameHistoryController extends Controller
             }
         }
 
-        Log::info("=== DEBUG: Análisis de pregunta actual ===", [
-            'question_id' => $questionId,
-            'index_in_list' => $currentIndex,
-            'is_last_question' => $isLastQuestion,
-            'next_question_id' => $nextQuestion?->id,
-        ]);
+//        Log::info("=== DEBUG: Análisis de pregunta actual ===", [
+//            'question_id' => $questionId,
+//            'index_in_list' => $currentIndex,
+//            'is_last_question' => $isLastQuestion,
+//            'next_question_id' => $nextQuestion?->id,
+//        ]);
 
 // Guardar la pregunta actual como la última respondida por el host
         $hostPlayer->last_answered_question_id = $questionId;
         $hostPlayer->save();
 
-        Log::info("=== DEBUG: Host actualizado ===", [
-            'host_id' => $hostPlayer->id,
-            'last_answered_question_id' => $hostPlayer->last_answered_question_id,
-        ]);
+//        Log::info("=== DEBUG: Host actualizado ===", [
+//            'host_id' => $hostPlayer->id,
+//            'last_answered_question_id' => $hostPlayer->last_answered_question_id,
+//        ]);
 
 
         $responses = $arena->players()
@@ -793,12 +793,12 @@ class GameHistoryController extends Controller
         // Actualizar el contador de la pregunta actual en sesión
         Session::put("game.$arenaGameId.current_question", $nextIndex + 1); // porque es 1-based
 
-        Log::info("=== NEXT QUESTION DEBUG ===", [
-            'arena_game_id' => $arenaGameId,
-            'new_current_question_id' => $questionId,
-            'last_answered_question_id' => $hostPlayer->last_answered_question_id,
-            'next_question_index' => $nextIndex,
-        ]);
+//        Log::info("=== NEXT QUESTION DEBUG ===", [
+//            'arena_game_id' => $arenaGameId,
+//            'new_current_question_id' => $questionId,
+//            'last_answered_question_id' => $hostPlayer->last_answered_question_id,
+//            'next_question_index' => $nextIndex,
+//        ]);
 
 
 
@@ -822,7 +822,7 @@ class GameHistoryController extends Controller
             //$totalSeconds = $start ? $start->diffInSeconds($end) : 0;
             $totalSeconds = round($start->diffInRealSeconds($end));
 
-            Log::info("Total secods".$totalSeconds);
+           // Log::info("Total secods".$totalSeconds);
             $arenaGameId->gameHistory->update([
                 'total_time_seconds' => $totalSeconds
             ]);

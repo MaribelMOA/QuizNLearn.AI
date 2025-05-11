@@ -233,7 +233,7 @@ class QuizController extends Controller
 
 // LIMPIEZA FINAL
         $content = QuizGenerationService::cleanContent($content);
-        Log::info("Content after cleaning ->" . $content);
+      //  Log::info("Content after cleaning ->" . $content);
 
         if (is_null($content) || trim($content) === '') {
             Log::error("generateWithGemini: Content is empty or null");
@@ -278,9 +278,9 @@ class QuizController extends Controller
         // Si el contenido es muy largo, resumir con Hugging Face
         $maxLength = 10000; // límite de caracteres
         if (strlen($content) > $maxLength) {
-            Log::info("Maximum length exceeded for quiz generation.");
+         //   Log::info("Maximum length exceeded for quiz generation.");
             $content = QuizGenerationService::summarizeWithGemini($content);
-            Log::info("Summarized content:".$content);
+           // Log::info("Summarized content:".$content);
         }
 
         // Llama al generador según config

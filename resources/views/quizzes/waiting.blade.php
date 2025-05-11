@@ -100,11 +100,11 @@
             if (window.useWebSockets) {
                 window.Echo.join(`arena.${arenaGameId}`)
                     .here((users) => {
-                        console.log("PLAYER Usuarios en el canal:", users); // ✅
+                       // console.log("PLAYER Usuarios en el canal:", users); // ✅
                         // updatePlayers(users);
                     })
                     .listen('.game.started', (e) => {
-                        console.log("Recibido game.started");
+                      //  console.log("Recibido game.started");
                         showStartingMessage();
                         window.location.href = `/arena/play/${arenaGameId}`;
                     });
@@ -117,7 +117,7 @@
         }
 
         function startPollingForStart() {
-            console.log("Iniciando polling para esperar inicio...");
+           // console.log("Iniciando polling para esperar inicio...");
             setInterval(() => {
                 axios.get(`/arena/${arenaGameId}/status`)
                     .then(response => {

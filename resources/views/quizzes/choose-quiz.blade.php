@@ -344,7 +344,7 @@
                 text: @json($errors->all()),
                 confirmButtonColor: '#6366F1'
             });
-            console.log("Erros: ",@json($errors->all()));
+          //  console.log("Erros: ",@json($errors->all()));
             @endif
 
             // Cerrar modal cuando se presiona el botón de cierre
@@ -394,7 +394,7 @@
             const addBtn = document.getElementById('addUrlButton');
             const countDisplay = document.getElementById('urlCount');
             const maxUrls = document.getElementById('maxUrls').value;
-            console.log(maxUrls);
+          //  console.log(maxUrls);
             const updateCount = () => {
                 const currentCount = container.querySelectorAll('input[name="urls[]"]').length;
                 countDisplay.textContent = `${currentCount} of ${maxUrls} URLs permited`;

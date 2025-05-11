@@ -290,7 +290,7 @@
                     </div>
                     <h3 class="text-xl font-bold mb-4">Standard</h3>
                     <div class="text-4xl font-bold mb-6">
-                        $5.99
+                        $9.99
                         <span class="text-sm text-gray-500 font-normal">/per month</span>
                     </div>
 
@@ -341,7 +341,7 @@
                     </div>
                     <h3 class="text-xl font-bold mb-4">Premium Plan</h3>
                     <div class="text-4xl font-bold mb-6">
-                        $9.99
+                        $15.99
                         <span class="text-sm text-gray-500 font-normal">/per month</span>
                     </div>
 

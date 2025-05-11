@@ -232,10 +232,10 @@ class ArenaGameController extends Controller
 
     public function removePlayer(Request $request, $arena)
     {
-        Log::info('Intentando eliminar jugador', [
-            'arena_game_id' => $arena,
-            'id' => $request->input('user_id')
-        ]);
+        //Log::info('Intentando eliminar jugador', [
+//            'arena_game_id' => $arena,
+//            'id' => $request->input('user_id')
+//        ]);
 
         $userId = $request->input('user_id');
 
@@ -325,14 +325,14 @@ class ArenaGameController extends Controller
 
     public function updatePlayerAnswer(Request $request, ArenaGame $arenaGame)
     {
-        Log::info('updatePlayerAnswer START', ['arena_game_id' => $arenaGame->id, 'user_id' => Auth::id()]);
+       // Log::info('updatePlayerAnswer START', ['arena_game_id' => $arenaGame->id, 'user_id' => Auth::id()]);
 
         $player = ArenaPlayer::where('arena_game_id', $arenaGame->id)
 
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        Log::info('Player found', ['player_id' => $player->id]);
+       // Log::info('Player found', ['player_id' => $player->id]);
 
         // Validar que el jugador esté en la partida y haya seleccionado una respuesta
         $request->validate([
@@ -340,16 +340,16 @@ class ArenaGameController extends Controller
             'question_id' => 'required|exists:quiz_questions,id',
         ]);
 
-        Log::info('Request validated', $request->all());
+     //   Log::info('Request validated', $request->all());
 
 
         // Obtener la respuesta seleccionada
         $selectedAnswer = $request->selected_answer_id ? QuizAnswer::find($request->selected_answer_id) : null;
         $question = QuizQuestion::find($request->question_id);
-        Log::info('Selected answer and question retrieved', [
-            'selected_answer_id' => $selectedAnswer?->id,
-            'question_id' => $question->id,
-        ]);
+//        Log::info('Selected answer and question retrieved', [
+//            'selected_answer_id' => $selectedAnswer?->id,
+//            'question_id' => $question->id,
+//        ]);
 
         $score = $selectedAnswer ? $selectedAnswer->is_correct ? 100 : 0 : 0;
 
@@ -361,11 +361,11 @@ class ArenaGameController extends Controller
         $player->has_responded = true; // El jugador ha respondido
         $player->save();
 
-        Log::info('Player updated', [
-            'player_id' => $player->id,
-            'score_added' => $score,
-            'total_score' => $player->score,
-        ]);
+//        Log::info('Player updated', [
+//            'player_id' => $player->id,
+//            'score_added' => $score,
+//            'total_score' => $player->score,
+//        ]);
 
         // Redirigir al método showQuestionResult para procesar los resultados de la pregunta
         return redirect()->route('arena.show_question_result', [
@@ -393,10 +393,10 @@ class ArenaGameController extends Controller
         $timeExpired = $players->first()?->question_started_at
             ? now()->diffInSeconds($players->first()->question_started_at) >= $questionDuration
             : false;
-        Log::info('Check status - internal', [
-            'allResponded' => $allResponded,
-            'timeExpired' => $timeExpired,
-        ]);
+//        Log::info('Check status - internal', [
+//            'allResponded' => $allResponded,
+//            'timeExpired' => $timeExpired,
+//        ]);
 
         return $allResponded || $timeExpired;
     }
@@ -459,21 +459,21 @@ class ArenaGameController extends Controller
 
     public function showQuestionResult(ArenaGame $arenaGame, QuizQuestion $question, $score)
     {
-        Log::info('showQuestionResult START', [
-            'arena_game_id' => $arenaGame->id,
-            'question_id' => $question->id,
-            'incoming_score' => $score
-        ]);
+//        Log::info('showQuestionResult START', [
+//            'arena_game_id' => $arenaGame->id,
+//            'question_id' => $question->id,
+//            'incoming_score' => $score
+//        ]);
         $gameHistory = $arenaGame->gameHistory;
         $quiz = $gameHistory?->quiz;
 
         // Obtener todos los jugadores en esta partida
         $players = $arenaGame->players ->where('is_host', false);
-        Log::info('Total players loaded', ['count' => $players->count()]);
+      //  Log::info('Total players loaded', ['count' => $players->count()]);
 
 
         if (!$this->isQuestionReady($arenaGame, $question)) {
-            Log::info('Redirecting back to play because not all players responded and time not expired');
+           // Log::info('Redirecting back to play because not all players responded and time not expired');
 
             return view('quizzes.player-results',['arenaGame' => $arenaGame,
                 'waiting'=>true,
@@ -487,7 +487,7 @@ class ArenaGameController extends Controller
 
         // Identificar la respuesta correcta
         $correctAnswer = $questionAnswers->firstWhere('is_correct', true);
-        Log::info('Correct answer determined', ['correct_answer_id' => $correctAnswer?->id]);
+     //   Log::info('Correct answer determined', ['correct_answer_id' => $correctAnswer?->id]);
 
         // Calcular puntaje por jugador
         $playersWithAnswers = $players->map(function ($player) use ($question, $correctAnswer,$score) {
@@ -505,11 +505,11 @@ class ArenaGameController extends Controller
           //  $player->score += $score;//$questionScore;
            // $player->has_responded = false; // Reset para próxima pregunta
             $player->save();
-            Log::info('Player score updated in showQuestionResult', [
-                'player_id' => $player->id,
-                'question_score' => $score,
-                'total_score' => $player->score,
-            ]);
+//            Log::info('Player score updated in showQuestionResult', [
+//                'player_id' => $player->id,
+//                'question_score' => $score,
+//                'total_score' => $player->score,
+//            ]);
 
             return [
                 'name' => $player->name,
@@ -527,10 +527,10 @@ class ArenaGameController extends Controller
                 ->where('last_answered_question_id', $question->id)
                 ->where('last_selected_answer_id', $answer->id)
                 ->count();
-            Log::info('Answer stat counted', [
-                'answer_id' => $answer->id,
-                'count' => $count,
-            ]);
+//            Log::info('Answer stat counted', [
+//                'answer_id' => $answer->id,
+//                'count' => $count,
+//            ]);
 
             return [
                 'answer_id' => $answer->id,
@@ -558,10 +558,10 @@ class ArenaGameController extends Controller
             ->orderByDesc('score')
             ->get();
        // $ranking = $playersWithAnswers->sortByDesc('total_score')->values();
-        Log::info('Ranking generated', ['ranking' => $ranking->toArray()]);
+     //   Log::info('Ranking generated', ['ranking' => $ranking->toArray()]);
 
 
-        Log::info('Returning view with data');
+      //  Log::info('Returning view with data');
 
         return view('quizzes.player-results', [
             'arenaGame' => $arenaGame,

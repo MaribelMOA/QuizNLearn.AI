@@ -210,7 +210,7 @@
             fetch(`/arena/${arenaId}/question/${questionId}/check-status`)
                 .then(res => res.json())
                 .then(data => {
-                    console.log("Polling result:", data);
+                   // console.log("Polling result:", data);
 
                     if (data.status === 'show_result') {
                         clearInterval(interval);

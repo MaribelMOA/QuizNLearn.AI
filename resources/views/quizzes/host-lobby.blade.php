@@ -134,7 +134,7 @@
 
                 axios.post(`/arena/${arenaGameId}/start-game`)
                     .then(() => {
-                        console.log("Game started");
+                       // console.log("Game started");
                     })
                     .catch(error => {
                         console.error("Error starting game:", error);
@@ -154,7 +154,7 @@
         function listenWithWebSockets() {
             window.Echo.join(`arena.${arenaGameId}`)
                 .here((users) => {
-                    console.log("HOST Users in channel:", users);
+                   // console.log("HOST Users in channel:", users);
                     updatePlayers(users);
                 })
                 .joining((user) => {
@@ -167,14 +167,14 @@
                     addPlayer(e.player.user);
                 })
                 .listen('.game.started', (e) => {
-                    console.log("Event received: game.started", e);
+                  //  console.log("Event received: game.started", e);
                     window.location.href = `/arena/host/${arenaGameId}`;
                 });
         }
 
         // Polling Mode
         function startPollingForPlayers() {
-            console.log("Starting polling for players...");
+            //console.log("Starting polling for players...");
             setInterval(() => {
                 axios.get(`/arena/${arenaGameId}/players`)
                     .then(response => {
@@ -243,7 +243,7 @@
                     return response.json();
                 })
                 .then(data => {
-                    console.log("Player removed", data);
+                   // console.log("Player removed", data);
                 })
                 .catch(err => {
                     console.error("Error removing player in backend", err);

@@ -9,7 +9,7 @@ class PlayModesService
 {
     public static function verifyOpenQuestionWithAI($question,$userAnswer, $correctAnswer)
     {
-        Log::info("ai supposed to check answer ");
+      //  Log::info("ai supposed to check answer ");
         $apiKey = config('services.gemini.key');
         $url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=$apiKey";
 
@@ -55,14 +55,14 @@ class PlayModesService
 
         $text = strtolower(trim($data['candidates'][0]['content']['parts'][0]['text']));
 
-        Log::info("AI verification response: '$text'");
+     //   Log::info("AI verification response: '$text'");
 
         // Verificar explícitamente si la IA responde "correct" o "incorrect"
         if ($text === 'correct') {
-            Log::info("AI response is correct.");
+           // Log::info("AI response is correct.");
             return true; // Respuesta correcta
         } elseif ($text === 'incorrect') {
-            Log::info("AI response is incorrect.");
+           // Log::info("AI response is incorrect.");
             return false; // Respuesta incorrecta
         } else {
             Log::error("Unexpected AI verification response: $text");
@@ -72,7 +72,7 @@ class PlayModesService
 
     public static function evaluateOpenQuestionWithAI($question, $userAnswer, $correctAnswer)
     {
-        Log::info("AI evaluating open question with feedback");
+      //  Log::info("AI evaluating open question with feedback");
         $apiKey = config('services.gemini.key');
         $url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=$apiKey";
 

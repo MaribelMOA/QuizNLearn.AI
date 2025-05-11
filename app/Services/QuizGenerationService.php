@@ -183,7 +183,7 @@ class QuizGenerationService
             return self::mapLabelToQuestionType($type);
         }, $questionTypes);
 
-        Log::info('Selected question types after mapping: ' . json_encode($mappedTypes));
+//        Log::info('Selected question types after mapping: ' . json_encode($mappedTypes));
 
         $total = $quiz->num_questions;
         $count = count($mappedTypes);
@@ -200,10 +200,10 @@ class QuizGenerationService
         foreach ($mappedTypes as $i => $type) {
             $distribution[self::mapQuestionTypeLabel($type)] = $base + ($i < $leftover ? 1 : 0);
         }
-        Log::info('Total number of questions: ' . $quiz->num_questions);
-        Log::info('Distribution calculation: base questions per type: ' . $base);
-        Log::info('Leftover questions: ' . $leftover);
-        Log::info('Final question distribution: ' . json_encode($distribution));
+//        Log::info('Total number of questions: ' . $quiz->num_questions);
+//        Log::info('Distribution calculation: base questions per type: ' . $base);
+//        Log::info('Leftover questions: ' . $leftover);
+//        Log::info('Final question distribution: ' . json_encode($distribution));
 
         return $distribution; // Ejemplo: ['Multiple Choice' => 3, 'True or False' => 2]
     }
@@ -284,9 +284,9 @@ EOT;
 
 
         $apiKey = config('services.gemini.key');
-        Log::info('Gemini API Key: ' . $apiKey);
+     //   Log::info('Gemini API Key: ' . $apiKey);
 
-        Log::info('GEMINI_API_KEY: ' . env('GEMINI_API_KEY'));
+      //  Log::info('GEMINI_API_KEY: ' . env('GEMINI_API_KEY'));
 
         $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey";
       //  $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey";
@@ -340,7 +340,7 @@ EOT;
         $quiz->quiz_data = $text;
         $quiz->save();
 
-        Log::info("Generated quiz: $text");
+     //   Log::info("Generated quiz: $text");
 
         return self::saveQuiz($text, $quiz, $questionTypes);
     }
@@ -359,7 +359,7 @@ EOT;
             return false;
         }
 
-        Log::info("Quiz generated and stored successfully.");
+//        Log::info("Quiz generated and stored successfully.");
         return true;
     }
 
@@ -381,11 +381,11 @@ EOT;
         $allSaved = true;
 
         foreach ($questions as $questionData) {
-            Log::info("Processing question: " . $questionData['question_text']);
+          //  Log::info("Processing question: " . $questionData['question_text']);
 
             $questionTypeLabel = $questionData['question_type'];
             $mappedType = QuizGenerationService::mapLabelToQuestionType($questionTypeLabel);
-            Log::info("Mapped question type: " . $mappedType);
+           // Log::info("Mapped question type: " . $mappedType);
 
             $type = QuestionType::where('name', $mappedType)->first();
 
@@ -407,7 +407,7 @@ EOT;
             }
 
             $quiz->questionTypes()->syncWithoutDetaching([$type->id]);
-           Log::info("Question saved: " . $question->question_text);
+         //  Log::info("Question saved: " . $question->question_text);
         }
 
         return $allSaved;

@@ -138,7 +138,7 @@
             fetch(`/arena/${arenaId}/question/${questionId}/check-status`)
                 .then(res => res.json())
                 .then(data => {
-                    console.log("Polling result:", data);
+                  //  console.log("Polling result:", data);
 
                     if (data.status === 'finished') {
                         clearInterval(interval);
@@ -164,7 +164,7 @@
             const form = document.getElementById('answer-form');
             const selectedAnswerInput = document.getElementById('selected-answer-id'); // hidden input for answer
 
-            console.log("Selected answer:",selectedAnswerInput);
+           // console.log("Selected answer:",selectedAnswerInput);
             let timeLeft = parseInt(countdownElement.textContent);
             const totalTime = timeLeft;
             const circumference = 283; // 2 * π * r where r=45
@@ -200,12 +200,12 @@
             const radioInputs = document.querySelectorAll('input[type="radio"]');
             radioInputs.forEach(input => {
                 input.addEventListener('change', function() {
-                    console.log('Radio seleccionado:', this.name, '=', this.value); // <-- Aquí mostramos qué radio se eligió
+                   // console.log('Radio seleccionado:', this.name, '=', this.value); // <-- Aquí mostramos qué radio se eligió
 
                     // También mostramos todos los radios por si ayuda a depurar
                     const formData = new FormData(form);
                     for (let [key, value] of formData.entries()) {
-                        console.log(`${key}: ${value}`);
+                       // console.log(`${key}: ${value}`);
                     }form.submit(); // autoenvía la respuesta cuando se selecciona
 
                 });

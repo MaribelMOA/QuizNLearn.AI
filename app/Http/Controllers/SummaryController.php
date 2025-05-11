@@ -167,7 +167,7 @@ class SummaryController extends Controller
 
 
         $content = QuizGenerationService::cleanContent($content);
-        Log::info("Content after cleaning ->" . $content);
+       // Log::info("Content after cleaning ->" . $content);
 
         if (is_null($content) || trim($content) === '') {
             Log::error("generateWithGemini: Content is empty or null");
