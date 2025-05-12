@@ -23,22 +23,30 @@ class DatabaseSeeder extends Seeder
 //        ]);
 
         $this->call([
+        PlanSeeder::class,
+        QuestionTypeSeeder::class,
+        FeatureTypeSeeder::class,
+        FeatureSeeder::class,
+        XpPriceSeeder::class,
+    ]);
 
-            PlanSeeder::class,
-            FeatureTypeSeeder::class,
-            FeatureSeeder::class,
-            XpPriceSeeder::class,
-            UserSeeder::class,
-            UserPlanSeeder::class,
-            FeatureTransactionSeeder::class,
-            XpTransactionSeeder::class,
+        // $this->call([
 
-            QuestionTypeSeeder::class,
-            QuizSeeder::class,
-            QuizQuestionSeeder::class,
-            QuizQuestionTypeSyncSeeder::class, // <- aquí
-            QuizAnswerSeeder::class,
+        //     PlanSeeder::class,
+        //     FeatureTypeSeeder::class,
+        //     FeatureSeeder::class,
+        //     XpPriceSeeder::class,
+        //     UserSeeder::class,
+        //     UserPlanSeeder::class,
+        //     FeatureTransactionSeeder::class,
+        //     XpTransactionSeeder::class,
 
-        ]);
+        //     QuestionTypeSeeder::class,
+        //     QuizSeeder::class,
+        //     QuizQuestionSeeder::class,
+        //     QuizQuestionTypeSyncSeeder::class, // <- aquí
+        //     QuizAnswerSeeder::class,
+
+        // ]);
     }
 }
