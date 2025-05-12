@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Smalot\PdfParser\Parser;
+use Illuminate\Support\Facades\DB;
 
 use Illuminate\Support\Facades\Response;
 //use Barryvdh\DomPDF\Facade as PDF;
@@ -73,12 +74,11 @@ class QuizController extends Controller
             ->with(['questionTypes', 'quizQuestions', 'gameHistories'])
             ->withCount('quizQuestions')
             ->select('quizzes.*')
-            ->selectSub(
-                GameHistory::selectRaw('MAX(created_at)')
-                    ->whereColumn('quiz_id', 'quizzes.id'),
-                'last_game_history'
-            )
-            ->orderByRaw('COALESCE(last_game_history, quizzes.created_at) DESC')
+            ->addSelect([
+                'last_game_history' => GameHistory::selectRaw('MAX(created_at)')
+                    ->whereColumn('quiz_id', 'quizzes.id')
+            ])
+            ->orderBy(DB::raw('COALESCE(last_game_history, quizzes.created_at)'), 'DESC')
             ->paginate(5);
 
 
