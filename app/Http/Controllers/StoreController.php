@@ -62,7 +62,6 @@ class StoreController extends Controller
 
     public function purchaseFeature(Request $request)
     {
-        Log::info('Iniciando proceso de compra de feature.', ['user_id' => Auth::id()]);
 
         $request->validate([
             'feature_id' => 'required|exists:features,id',
@@ -70,15 +69,12 @@ class StoreController extends Controller
 
         $user = Auth::user();
         $featureId = $request->input('feature_id');
-        Log::info('Feature ID recibido.', ['feature_id' => $featureId]);
 
         // Obtener la feature
         $feature = Feature::with('featureType')->findOrFail($featureId);
-        Log::info('Feature encontrada.', ['feature' => $feature->toArray()]);
 
         // Calcular usos disponibles actuales
         $uses = UsageService::calculateAvailableUses($user->id);
-        Log::info('Usos disponibles calculados.', ['uses' => $uses]);
 
         $featureCode = $feature->featureType->code;
 
@@ -91,16 +87,12 @@ class StoreController extends Controller
 
         // Verificar si el usuario tiene suficiente XP
         if ($user->xp < $feature->xp_price) {
-            Log::info('XP insuficiente para la compra.', [
-                'user_xp' => $user->xp,
-                'xp_price' => $feature->xp_price
-            ]);
+
             return redirect()->back()->with('error', 'You do not have enough XP points for this purchase.');
         }
 
         try {
             DB::transaction(function () use ($user, $feature) {
-                Log::info('Iniciando transacción de compra de feature.');
 
                 // Registrar la compra
                 FeatureTransaction::create([
@@ -109,16 +101,12 @@ class StoreController extends Controller
                     'quantity' => 1,
                     'price_xp' => $feature->xp_price,
                 ]);
-                Log::info('Transacción registrada.');
 
                 // Restar XP al usuario
                 $user->xp -= $feature->xp_price;
                 $user->save();
-
-                Log::info('XP descontado y usuario actualizado.', ['nuevo_xp' => $user->xp_points]);
             });
 
-            Log::info('Compra completada exitosamente.');
             return redirect()->back()->with('success', 'Feature purchased successfully.');
         } catch (\Exception $e) {
             Log::error('Error durante la compra de feature.', ['error' => $e->getMessage()]);

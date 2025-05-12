@@ -10,20 +10,62 @@
 
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            <!-- 🟩 Grid de 2 tarjetas (Summary Stats + Available Uses) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+            <!-- 🟩 Grid de 1 tarjetas (Summary Stats + Available Uses) -->
+            <div class="grid grid-cols-1 sm:grid-cols-1 gap-6 mb-6">
 
-                <!-- Summaries Stats Card -->
-                <div class="bg-green-50 border border-green-200 rounded-lg p-3 w-full">
-                    <h3 class="text-base font-semibold text-green-800 mb-3">Summary Stats</h3>
-                    <div class="grid grid-cols-2 gap-6 text-lg">
-                        <div class="flex items-center">
-                            <span class="text-gray-600 mr-2">Total Summaries</span>
-                            <span class="font-bold text-gray-900 text-3xl">{{ $totalSummaries }}</span>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Total Summaries Card -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden border-l-4 border-indigo-500 hover:shadow-lg transition-all duration-200">
+                        <div class="p-5">
+                            <div class="flex items-center">
+                                <div class="bg-indigo-100 rounded-full p-3 mr-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600">Total Summaries</p>
+                                    <div class="flex items-baseline">
+                                        <p class="text-3xl font-bold text-gray-800">{{ $totalSummaries }}</p>
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex items-center">
-                            <span class="text-gray-600 mr-2">Available Creations</span>
-                            <span class="font-bold text-green-700 text-3xl">{{ $availableCreations }}</span>
+                    </div>
+
+                    <!-- Available Creations Card -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden border-l-4 border-green-500 hover:shadow-lg transition-all duration-200">
+                        <div class="p-5">
+                            <div class="flex items-center">
+                                <div class="bg-green-100 rounded-full p-3 mr-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600">Available Creations</p>
+                                    <div class="flex items-baseline">
+                                        <p class="text-3xl font-bold text-green-600">{{ $availableCreations }}</p>
+                                        <span class="ml-2 text-xs font-medium text-gray-600">this month</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Progress Bar -->
+                            @php
+                                $totalAllowed = $availableCreations + $totalSummaries;
+                                $percentUsed = $totalAllowed > 0 ? ($totalSummaries / $totalAllowed) * 100 : 0;
+                            @endphp
+                            <div class="mt-3">
+                                <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                    <span>Usage</span>
+                                    <span>{{ $totalSummaries }} of {{ $totalAllowed }}</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: {{ $percentUsed }}%"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

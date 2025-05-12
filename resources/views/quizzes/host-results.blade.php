@@ -175,11 +175,6 @@
                             </svg>
                         </button>
 
-                        <div id="auto-advance" class="mt-3 text-center text-sm text-gray-600">
-                            <span>Auto-advancing in </span>
-                            <span id="countdown" class="font-medium">10</span>
-                            <span> seconds</span>
-                        </div>
                     </form>
                 @else
                     <form action="{{ route('arena.finish_game', ['arenaGameId' => $arenaGameId]) }}" method="POST" class="w-full max-w-md">
@@ -196,35 +191,6 @@
         </div>
     </div>
 
-    @if (!$isLastQuestion)
-        @push('scripts')
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    // Auto-advance countdown
-                    const countdownElement = document.getElementById('countdown');
-                    const form = document.querySelector('form');
 
-                    let timeLeft = parseInt(countdownElement.textContent);
-
-                    const timer = setInterval(function() {
-                        timeLeft--;
-
-                        if (timeLeft <= 0) {
-                            clearInterval(timer);
-                            form.submit(); // Auto-submit the form
-                        }
-
-                        // Update countdown text
-                        countdownElement.textContent = timeLeft;
-
-                        // Add visual feedback when time is running low
-                        if (timeLeft <= 3) {
-                            countdownElement.classList.add('text-red-600', 'font-bold');
-                        }
-                    }, 1000);
-                });
-            </script>
-        @endpush
-    @endif
 </x-app-layout>
 

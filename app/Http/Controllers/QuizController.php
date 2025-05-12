@@ -100,6 +100,10 @@ class QuizController extends Controller
         $availableCreations = $uses['quiz_creation']['remaining']?? 4;
         $studyModeUses = $uses['study_mode']['remaining']?? 5;
         $arenaModeUses = $uses['arena_mode']['remaining']?? 6;
+
+        $arenaTotalAvailable = $uses['arena_mode']['total_available']?? 7;
+        $studyTotalAvailable = $uses['study_mode']['total_available']?? 7;
+        $creationTotalAvailable = $uses['quiz_creation']['total_available']?? 7;
 //        $studyModeUses = 0;
      //   $arenaModeUses = 50;
      //   $availableCreations=0;
@@ -125,6 +129,9 @@ class QuizController extends Controller
             'pdf_files'     => $plan->pdf_files ?? 0,
             'urls'          => $plan->urls ?? 0,
             'text_limit'    => $plan->text_limit ?? 1000,
+            'creationTotalAvailable' =>$creationTotalAvailable,
+            'studyTotalAvailable' => $studyTotalAvailable,
+            'arenaTotalAvailable' => $arenaTotalAvailable,
         ];
 
 
@@ -135,6 +142,7 @@ class QuizController extends Controller
             'studyModeUses',
             'arenaModeUses',
             'planLimits'
+
         ));
     }
 

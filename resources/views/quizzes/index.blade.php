@@ -9,63 +9,139 @@
 
 
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div>
 
-            <!-- 🟩 Grid de 2 tarjetas (Quiz Stats + Available Uses) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+            <!-- Stats Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <!-- Total Quizzes Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="p-2 rounded-lg bg-blue-100 mr-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-700">Total Quizzes</h3>
+                            </div>
 
-                <!-- Quiz Stats Card -->
-                <div class="bg-green-50 border border-green-200 rounded-lg p-3 w-full">
-                    <h3 class="text-base font-semibold text-green-800 mb-3">Quiz Stats</h3>
-                    <div class="grid grid-cols-2 gap-6 text-lg">
-                        <div class="flex items-center">
-                            <span class="text-gray-600 mr-2">Total Quizzes</span>
-                            <span class="font-bold text-gray-900 text-3xl">{{ $totalQuizzes }}</span>
                         </div>
-                        <div class="flex items-center">
-                            <span class="text-gray-600 mr-2">Available Creations</span>
-                            <span class="font-bold text-green-700 text-3xl">{{ $availableCreations }}</span>
+
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-3xl font-bold text-gray-900">{{ $totalQuizzes }}</span>
+                                <p class="text-sm text-gray-500 mt-1">Created quizzes</p>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Creations Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="p-5">
+                        <div class="flex items-center mb-4">
+                            <div class="p-2 rounded-lg bg-green-100 mr-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-700">Available Creations</h3>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-3xl font-bold text-gray-900">{{ $availableCreations }}</span>
+                                <span class="text-sm text-gray-500">this month</span>
+                            </div>
+
+                            @php
+                                // Calculate percentage based on plan limit (assuming a plan limit of 10 for this example)
+                                // You should replace this with your actual plan limit logic
+                               // $planLimit = 10; // Example value
+                                $usedCreations = $planLimits['creationTotalAvailable'] - $availableCreations;
+                                $percentUsed = min(100, max(0, ($usedCreations / max(1, $planLimits['creationTotalAvailable'] )) * 100));
+                            @endphp
+
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                                <div class="bg-green-600 h-2.5 rounded-full" style="width: {{ $percentUsed }}%"></div>
+                            </div>
+
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span>{{ $usedCreations }} used</span>
+                                <span>{{ $planLimits['creationTotalAvailable']  }} limit</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Available Uses Card -->
-                <div class="bg-purple-50 border border-purple-200 rounded-lg p-3 w-full">
-                    <h3 class="text-base font-semibold text-purple-800 mb-3">Available Uses</h3>
-                    <div class="grid grid-cols-2 gap-6 text-lg">
-                        <div class="flex items-center">
-                            <span class="text-purple-700 mr-2">Study Mode</span>
-                            <span class="text-sm bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full w-fit">{{ $studyModeUses }} left</span>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="p-5">
+                        <div class="flex items-center mb-4">
+                            <div class="p-2 rounded-lg bg-purple-100 mr-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-700">Available Uses</h3>
                         </div>
-                        <div class="flex items-center">
-                            <span class="text-blue-700 mr-2">Arena Mode</span>
-                            <span class="text-sm bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full w-fit">{{ $arenaModeUses }} left</span>
+
+                        <!-- Study Mode -->
+                        <div class="mb-3">
+                            <div class="flex items-center justify-between mb-1">
+                                <div class="flex items-center">
+                            <span class="inline-flex items-center justify-center p-1 bg-purple-100 text-purple-700 rounded-md mr-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                </svg>
+                            </span>
+                                    <span class="text-sm font-medium text-gray-700">Study Mode</span>
+                                </div>
+                                <span class="text-sm font-semibold text-purple-700">{{ $studyModeUses }} left</span>
+                            </div>
+
+                            @php
+                                // Calculate percentage for study mode (assuming a limit of 20 for this example)
+                                $studyModeLimit =$planLimits['studyTotalAvailable'] ; // Example value
+                                $studyModePercentLeft = min(100, max(0, ($studyModeUses / max(1, $studyModeLimit)) * 100));
+                            @endphp
+
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-purple-600 h-2 rounded-full" style="width: {{ $studyModePercentLeft }}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Arena Mode -->
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <div class="flex items-center">
+                            <span class="inline-flex items-center justify-center p-1 bg-blue-100 text-blue-700 rounded-md mr-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </span>
+                                    <span class="text-sm font-medium text-gray-700">Arena Mode</span>
+                                </div>
+                                <span class="text-sm font-semibold text-blue-700">{{ $arenaModeUses }} left</span>
+                            </div>
+
+                            @php
+                                // Calculate percentage for arena mode (assuming a limit of 15 for this example)
+                                $arenaModeLimit = $planLimits['arenaTotalAvailable']; // Example value
+                                $arenaModePercentLeft = min(100, max(0, ($arenaModeUses / max(1, $arenaModeLimit)) * 100));
+                            @endphp
+
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $arenaModePercentLeft }}%"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
             </div>
-            <!-- Search Bar -->
-            <!-- <div class="mb-6">
-                <form action="{{ route('quizzes.index') }}" method="GET">
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
-                        <input type="text" name="search" id="search-input" value="{{ request('search') }}" class="pl-10 pr-10 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" placeholder="Search by title, mode, difficulty or exact number of questions">
-                        @if(request('search'))
-                <button type="button" id="clear-search" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-@endif
-            </div>
-        </form>
-    </div>-->
-
-
+        </div>
 
             <!-- Search and Filter Section -->
             <!-- Search and Filter Section (Combinada) -->
