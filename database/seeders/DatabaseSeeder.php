@@ -21,14 +21,17 @@ class DatabaseSeeder extends Seeder
 //            'name' => 'Test User',
 //            'email' => 'test@example.com',
 //        ]);
+        if (Plan::count() === 0) {
+            $this->call([
+                PlanSeeder::class,
+                QuestionTypeSeeder::class,
+                FeatureTypeSeeder::class,
+                FeatureSeeder::class,
+                XpPriceSeeder::class,
+            ]);
+        }
 
-        $this->call([
-        PlanSeeder::class,
-        QuestionTypeSeeder::class,
-        FeatureTypeSeeder::class,
-        FeatureSeeder::class,
-        XpPriceSeeder::class,
-    ]);
+
 
         // $this->call([
 
