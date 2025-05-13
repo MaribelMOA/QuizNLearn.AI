@@ -440,7 +440,7 @@ class GameHistoryController extends Controller
             'user_id' => $user->id,
             'quiz_id' => $quiz->id,
             'mode' => $mode,
-            'total_time_seconds' => $duration,
+            'total_time_seconds' => (int)$duration,
             'score' => 100,
         ]);
 
