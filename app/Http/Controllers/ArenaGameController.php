@@ -114,7 +114,13 @@ class ArenaGameController extends Controller
                     ->whereColumn('quiz_id', 'quizzes.id'),
                 'last_game_history'
             )
-            ->orderByRaw('COALESCE(last_game_history, quizzes.created_at) DESC')
+            ->orderByRaw(
+                'COALESCE((
+            SELECT MAX(created_at)
+            FROM game_histories
+            WHERE game_histories.quiz_id = quizzes.id
+        ), quizzes.created_at) DESC'
+            )
             ->paginate(5);
 
 

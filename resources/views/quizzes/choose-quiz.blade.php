@@ -64,20 +64,20 @@
                                     // 1. Preguntas abiertas no permitidas en Arena
                                     if (hasOpenQuestions) {
                                         Swal.fire({
-                                            title: 'Modo Arena no disponible',
-                                            text: 'Este cuestionario contiene preguntas abiertas y no se puede jugar en modo Arena.',
+                                            title: 'Arena mode unavailable',
+                                            text: 'This quizz contains open answer questions and is not allowed to be player in Arena Mode.',
                                             icon: 'error',
-                                            confirmButtonText: 'Aceptar'
+                                            confirmButtonText: 'Accept'
                                         });
                                         return;
                                     }
                                     // 2. Sin usos disponibles para Arena
                                     if (arenaModeUses <= 0) {
                                         Swal.fire({
-                                            title: 'Sin usos para Modo Arena',
-                                            text: 'Has agotado tus usos para jugar en modo Arena. Vuelve más tarde o selecciona otro modo.',
+                                            title: 'No uses left for Arena Mode',
+                                            text: 'You have exhausted your uses for playing in Arena Mode. Upgrade your plan or choose another mode.',
                                             icon: 'warning',
-                                            confirmButtonText: 'Aceptar'
+                                            confirmButtonText: 'Accept'
                                         });
                                         return;
                                     }
@@ -85,8 +85,8 @@
                                     // 3. Sin usos disponibles para Estudio
                                     if (studyModeUses <= 0) {
                                         Swal.fire({
-                                            title: 'Sin usos para Modo Estudio',
-                                            text: 'Has agotado tus usos para jugar en modo Estudio. Intenta más tarde o elige otro modo.',
+                                            title: 'No uses left for Study Mode',
+                                            text: 'You have exhausted your uses for playing in Study Mode. Upgrade your paln or choose another mode.',
                                             icon: 'warning',
                                             confirmButtonText: 'Aceptar'
                                         });

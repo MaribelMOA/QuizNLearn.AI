@@ -237,14 +237,27 @@ For each question, respond in JSON format with this structure:
     }
   ]
 }
-Special instructions for "True or False" questions:
-- ALWAYS include exactly two answers: one with "True" and one with "False".
-- Specify clearly which one is correct (is_correct: true) and which one is incorrect (is_correct: false).
-- Provide an explanation for both answers (each explanation must be concise and up to 150 characters).
+Instructions:
 
-Generate the entire JSON as an array. Please make sure the explanations are concise and no longer than 150 characters.
-DO NOT explain anything outside the JSON.
+1. For **Multiple Choice** questions:
+   - Include 4 answer options.
+   - Only one must have "is_correct": true.
+   - Each answer must have a concise explanation.
 
+2. For **True or False** questions:
+   - Include exactly two answers: one "True", one "False".
+   - Clearly mark which one is correct using "is_correct".
+   - Each must have a brief explanation (max 150 characters).
+
+3. For **Open Questions**:
+   - Include **one expected answer** as a sample in "answers".
+   - Set "is_correct": true for this sample.
+   - Provide a brief explanation that justifies the sample or expected response.
+
+All explanations must be concise and no longer than 150 characters.
+
+Return the entire output as a JSON array.
+DO NOT include anything outside the JSON.
 
 
 EOT;
