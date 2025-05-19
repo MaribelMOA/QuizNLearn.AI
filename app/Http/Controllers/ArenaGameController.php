@@ -189,6 +189,31 @@ class ArenaGameController extends Controller
         if (!$arenaGame) {
             return redirect()->back()->withErrors(['pin' => 'Invalid or inactive game PIN.']);
         }
+        $userId = Auth::id();
+
+        // 1. Verificar si ya está inscrito (autenticado)
+        $existingPlayer = ArenaPlayer::where('arena_game_id', $arenaGame->id)
+            ->where('user_id', $userId)
+           // ->when(!$userId, fn($q) => $q->where('name', $request->player_name))
+            ->first();
+
+        if ($existingPlayer) {
+            // Ya existe: guardar en sesión y redirigir
+            session([
+                'player_name' => $existingPlayer->name,
+                'arena_player_id' => $existingPlayer->id,
+                'arena_game_pin' => $arenaGame->pin,
+                'arena_game_id' => $arenaGame->id,
+            ]);
+
+            return view('quizzes.waiting', [
+                'player' => $existingPlayer,
+                'arenaGameId' => $arenaGame->id,
+                'pin' => $arenaGame->pin,
+                'score' => $existingPlayer->score,
+            ]);
+        }
+
         $currentPlayersCount = ArenaPlayer::where('arena_game_id', $arenaGame->id)
             ->where('is_host', false)
             ->count();
@@ -234,6 +259,7 @@ class ArenaGameController extends Controller
             'pin' => $arenaGame->pin,
             'score'=>0,
         ]);
+      //  return redirect()->route('arena.waiting');
     }
 
     public function removePlayer(Request $request, $arena)
@@ -263,7 +289,7 @@ class ArenaGameController extends Controller
             'arena_game_id',
         ]);
 
-
+      //  return redirect('quizzes.index');
         return response()->json(['status' => 'ok']);
     }
 
@@ -410,6 +436,9 @@ class ArenaGameController extends Controller
 
     public function checkResultStatus(ArenaGame $arenaGame, QuizQuestion $question)
     {
+        if (!ArenaGame::where('id', $arenaGame->id)->exists()) {
+            return response()->json(['status' => 'finished']);
+        }
         $arenaGame->load('players');
         $players = $arenaGame->players;
         $hostPlayer = $players->where('is_host', true)->first();

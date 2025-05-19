@@ -814,18 +814,30 @@ class GameHistoryController extends Controller
         $arenaGameId->players()->delete();
         $arenaGameId->save();
 
-        if ($arenaGameId->gameHistory) {
-            $start = \Carbon\Carbon::parse($arenaGameId->start_time);
-            $end = \Carbon\Carbon::parse($arenaGameId->end_time);
+        // Obtener cuántas preguntas se respondieron desde la sesión
+        $questionsAnswered = Session::get("game.$arenaGameId.current_question");
 
 
-            //$totalSeconds = $start ? $start->diffInSeconds($end) : 0;
-            $totalSeconds = round($start->diffInRealSeconds($end));
+        // Obtener total de preguntas del quiz desde el modelo relacionado
+        $gameHistory = $arenaGameId->gameHistory;
 
-           // Log::info("Total secods".$totalSeconds);
-            $arenaGameId->gameHistory->update([
-                'total_time_seconds' => $totalSeconds
-            ]);
+        if ($gameHistory && $gameHistory->quiz) {
+            $totalQuestions = $gameHistory->quiz->num_questions;
+            $half = ceil($totalQuestions / 2);
+            //$questionsAnswered = count(Session::get('used_questions', []));
+            Log::info("Questions answered: $questionsAnswered");
+            Log::info("Half questions answered: $half");
+          //  if ($questionsAnswered >= $half) {
+                $start = \Carbon\Carbon::parse($arenaGameId->start_time);
+                $end = \Carbon\Carbon::parse($arenaGameId->end_time);
+                $totalSeconds = round($start->diffInRealSeconds($end));
+
+                $gameHistory->update([
+                    'total_time_seconds' => $totalSeconds
+                ]);
+//            } else {
+//                $gameHistory->delete(); // 👈 Elimina el GameHistory si se respondió menos de la mitad
+//            }
         }
 
         Session::forget('arena_quiz_id');

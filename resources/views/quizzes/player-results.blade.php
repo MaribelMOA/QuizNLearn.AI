@@ -121,51 +121,51 @@
                         <div class="p-4">
                             <div class="space-y-3 max-h-96 overflow-y-auto pr-2">
                                 @foreach($ranking as $index => $player)
-                                        @php
-                                            $rankClass = '';
-                                            $medalIcon = '';
+                                    @php
+                                        $rankClass = '';
+                                        $medalIcon = '';
 
-                                            if($index === 0) {
-                                                $rankClass = 'bg-amber-50 border-amber-200';
-                                                $medalIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                                            </svg>';
-                                            } else if($index === 1) {
-                                                $rankClass = 'bg-gray-50 border-gray-200';
-                                                $medalIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                                            </svg>';
-                                            } else if($index === 2) {
-                                                $rankClass = 'bg-amber-50 border-amber-200 opacity-70';
-                                                $medalIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                                            </svg>';
-                                            }
-                                        @endphp
+                                        if($index === 0) {
+                                            $rankClass = 'bg-amber-50 border-amber-200';
+                                            $medalIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                                        </svg>';
+                                        } else if($index === 1) {
+                                            $rankClass = 'bg-gray-50 border-gray-200';
+                                            $medalIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                                        </svg>';
+                                        } else if($index === 2) {
+                                            $rankClass = 'bg-amber-50 border-amber-200 opacity-70';
+                                            $medalIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                                        </svg>';
+                                        }
+                                    @endphp
 
-                                        <div class="border rounded-lg p-3 flex items-center justify-between {{ $rankClass }}">
-                                            <div class="flex items-center">
-                                                <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center mr-3 font-bold text-indigo-800">
-                                                    {{ $index + 1 }}
-                                                </div>
-                                                <div>
-                                                    <span class="font-medium text-gray-800">{{ $player->name }}</span>
-                                                    @if(!empty($medalIcon))
-                                                        <span class="ml-2">{!! $medalIcon !!}</span>
-                                                    @endif
-                                                </div>
+                                    <div class="border rounded-lg p-3 flex items-center justify-between {{ $rankClass }}">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center mr-3 font-bold text-indigo-800">
+                                                {{ $index + 1 }}
                                             </div>
-                                            <div class="text-right">
-                                                <span class="font-bold text-indigo-600">{{ $player->score }}</span>
-                                                <span class="text-gray-600">pts</span>
-
-                                                @if(isset($player->score_change) && $player->score_change > 0)
-                                                    <span class="ml-1 text-green-600 text-sm">+{{ $player->score_change }}</span>
-                                                @elseif(isset($player->score_change) && $player->score_change == 0)
-                                                    <span class="ml-1 text-gray-500 text-sm">+0</span>
+                                            <div>
+                                                <span class="font-medium text-gray-800">{{ $player->name }}</span>
+                                                @if(!empty($medalIcon))
+                                                    <span class="ml-2">{!! $medalIcon !!}</span>
                                                 @endif
                                             </div>
                                         </div>
+                                        <div class="text-right">
+                                            <span class="font-bold text-indigo-600">{{ $player->score }}</span>
+                                            <span class="text-gray-600">pts</span>
+
+                                            @if(isset($player->score_change) && $player->score_change > 0)
+                                                <span class="ml-1 text-green-600 text-sm">+{{ $player->score_change }}</span>
+                                            @elseif(isset($player->score_change) && $player->score_change == 0)
+                                                <span class="ml-1 text-gray-500 text-sm">+0</span>
+                                            @endif
+                                        </div>
+                                    </div>
 
 
                                 @endforeach
@@ -174,29 +174,29 @@
                     </div>
                 </div>
 
-{{--                <!-- Ranking Table -->--}}
-{{--                <div class="bg-white rounded-xl shadow-md p-6">--}}
-{{--                    <h2 class="text-lg font-semibold mb-4 text-gray-700">Ranking de Jugadores</h2>--}}
-{{--                    <table class="w-full text-left table-auto">--}}
-{{--                        <thead class="bg-gray-100 text-sm text-gray-600">--}}
-{{--                        <tr>--}}
-{{--                            <th class="py-2 px-3">#</th>--}}
-{{--                            <th class="py-2 px-3">Name</th>--}}
-{{--                            <th class="py-2 px-3">Total Score</th>--}}
-{{--                        </tr>--}}
-{{--                        </thead>--}}
-{{--                        <tbody class="text-gray-800">--}}
-{{--                        @foreach($ranking as $index => $player)--}}
-{{--                            <tr class="{{ $index === 0 ? 'bg-yellow-100 font-bold' : '' }}">--}}
-{{--                                <td class="py-2 px-3">{{ $index + 1 }}</td>--}}
-{{--                                <td class="py-2 px-3">{{ $player['name'] }}</td>--}}
-{{--                                <td class="py-2 px-3">{{ $player['total_score'] }}</td>--}}
+                {{--                <!-- Ranking Table -->--}}
+                {{--                <div class="bg-white rounded-xl shadow-md p-6">--}}
+                {{--                    <h2 class="text-lg font-semibold mb-4 text-gray-700">Ranking de Jugadores</h2>--}}
+                {{--                    <table class="w-full text-left table-auto">--}}
+                {{--                        <thead class="bg-gray-100 text-sm text-gray-600">--}}
+                {{--                        <tr>--}}
+                {{--                            <th class="py-2 px-3">#</th>--}}
+                {{--                            <th class="py-2 px-3">Name</th>--}}
+                {{--                            <th class="py-2 px-3">Total Score</th>--}}
+                {{--                        </tr>--}}
+                {{--                        </thead>--}}
+                {{--                        <tbody class="text-gray-800">--}}
+                {{--                        @foreach($ranking as $index => $player)--}}
+                {{--                            <tr class="{{ $index === 0 ? 'bg-yellow-100 font-bold' : '' }}">--}}
+                {{--                                <td class="py-2 px-3">{{ $index + 1 }}</td>--}}
+                {{--                                <td class="py-2 px-3">{{ $player['name'] }}</td>--}}
+                {{--                                <td class="py-2 px-3">{{ $player['total_score'] }}</td>--}}
 
-{{--                            </tr>--}}
-{{--                        @endforeach--}}
-{{--                        </tbody>--}}
-{{--                    </table>--}}
-{{--                </div>--}}
+                {{--                            </tr>--}}
+                {{--                        @endforeach--}}
+                {{--                        </tbody>--}}
+                {{--                    </table>--}}
+                {{--                </div>--}}
 
             @endif
         </div>
@@ -210,7 +210,7 @@
             fetch(`/arena/${arenaId}/question/${questionId}/check-status`)
                 .then(res => res.json())
                 .then(data => {
-                   // console.log("Polling result:", data);
+                    console.log("Polling result:", data);
 
                     if (data.status === 'show_result') {
                         clearInterval(interval);

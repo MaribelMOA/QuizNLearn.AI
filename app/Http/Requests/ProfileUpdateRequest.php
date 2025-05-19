@@ -35,6 +35,8 @@ class ProfileUpdateRequest extends FormRequest
                 }),
                 'in:paypal,stripe',
             ],
+            'profile_image' => ['nullable', 'image', 'max:2048'], // 2MB máximo
+
 
         ];
     }

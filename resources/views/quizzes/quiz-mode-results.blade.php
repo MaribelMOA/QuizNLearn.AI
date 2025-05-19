@@ -37,7 +37,9 @@
                                             <label class="flex items-center space-x-2">
                                                 <input type="radio" disabled class="text-indigo-600"
                                                     {{ $userAnswer == $answer->id ? 'checked' : '' }}>
-                                                <span class="text-gray-700">{{ $answer->answer_text }}</span>
+                                                <span class="text-gray-700">{{ $answer->answer_text }}@if ($answer->is_correct)
+                                                        <span class="ml-2 text-green-600 font-semibold">(Correct)</span>
+                                                    @endif</span>
                                             </label>
                                         @endforeach
                                     </div>

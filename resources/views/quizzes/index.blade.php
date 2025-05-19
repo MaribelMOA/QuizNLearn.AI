@@ -220,8 +220,8 @@
                             const studyModeUses = {{ $studyModeUses }};
 
                             //LO DE DESHABILITAR
-                            //   modeSelect.addEventListener('change', updateStartButtonStyle);
-
+                            modeSelect.addEventListener('change', updateStartButtonStyle);
+                            updateStartButtonStyle();
 
                             startButton.addEventListener('click', function(event) {
                                 event.preventDefault();
@@ -258,7 +258,7 @@
                                             title: 'No uses left for Study Mode',
                                             text: 'You have exhausted your uses for playing in Study Mode. Upgrade your plan or choose another mode.',
                                             icon: 'warning',
-                                            confirmButtonText: 'Aceptar'
+                                            confirmButtonText: 'OK'
                                         });
                                         return;
                                     }
@@ -284,11 +284,16 @@
                                         shouldDisableVisually = true;
                                     }
                                 }
+                                else if (selectedMode === 'Quiz') {
+                                    shouldDisableVisually = false;
+                                }
 
                                 if (shouldDisableVisually) {
-                                    startButton.classList.add('opacity-50', 'cursor-not-allowed');
+                                    //startButton.classList.add('opacity-50', 'cursor-not-allowed');
+                                    startButton.classList.add('opacity-50');
                                 } else {
-                                    startButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                                   // startButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                                    startButton.classList.remove('opacity-50');
                                 }
                             }
 
@@ -862,6 +867,24 @@
                     });
                     return false;
                 }
+            }
+
+            const topic = document.getElementById('topic').value.trim();
+            const urls2 = [...document.querySelectorAll('input[name="urls[]"]')].filter(el => el.value.trim() !== '');
+            const pdf = document.getElementById('pdf_file').files.length > 0;
+            const text = document.getElementById('manual_text').value.trim();
+
+            if (topic || urls2.length > 0 || pdf || text) {
+                return true; // Al menos uno está lleno, permitir envío
+            } else {
+                // Mostrar alerta con SweetAlert
+                await Swal.fire({
+                    icon: 'warning',
+                    title: 'Incomplete Quiz Data',
+                    text: 'Please fill at least one of the following: Topic, URL, PDF or Manual Text.',
+                    confirmButtonColor: '#6366F1'
+                });
+                return false; // No se permite el envío
             }
 
             return true; // ✅ Todo bien

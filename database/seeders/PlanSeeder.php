@@ -14,7 +14,7 @@ class PlanSeeder extends Seeder
     {
         Plan::insert([
             [
-                'name' => 'Gratuito',
+                'name' => 'Free',
                 'price' => 0,
                 // Límite de preguntas
                 'description' => 'PDFs (1 archivo 2MB), URLs (1), Texto (1,000 palabras), 10 preguntas máx.',
@@ -31,7 +31,7 @@ class PlanSeeder extends Seeder
                 'questions_limit' => 10,
             ],
             [
-                'name' => 'Básico',
+                'name' => 'Basic',
                 'price' => 10,
                 'description' => 'PDFs (3 archivos 5MB), URLs (3), Texto (2,500 palabras), 25 preguntas máx.',
                 'duration_months' => 1,

@@ -13,7 +13,7 @@ class PlayModesService
         $apiKey = config('services.gemini.key');
         $url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=$apiKey";
 
-        $prompt = "Given the question: '$question', determine if the user answer: '$userAnswer' is semantically similar or correct compared to the correct answer: '$correctAnswer'. Only respond with 'correct' or 'incorrect'.";
+        $prompt = "You are an expert evaluator. Given the question: '$question' and the user's answer: '$userAnswer', determine if the user's answer is factually and semantically correct based on your own knowledge of the topic. Only respond with: correct or incorrect. Do not include any explanation or additional text.";
 
         $postData = [
             "contents" => [
@@ -76,10 +76,10 @@ class PlayModesService
         $apiKey = config('services.gemini.key');
         $url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=$apiKey";
 
-        $prompt = "Given the question: '$question', the correct answer is: '$correctAnswer'. The user answered: '$userAnswer'. "
-            . "1. Evaluate if the answer is semantically correct. "
-            . "2. Respond in JSON format as: {\"result\": \"correct/incorrect\", \"feedback\": \"[short feedback in English, max 150 characters]\"}. "
-            . "Only return the JSON object. No other text.";
+        $prompt = "You are an expert evaluator. Given the question: '$question' and the user's answer: '$userAnswer', decide whether the answer is factually and semantically correct based on your understanding of the question alone. "
+            . "Respond strictly in JSON format like this: {\"result\": \"correct\" or \"incorrect\", \"feedback\": \"[brief feedback in English, max 150 characters]\"}. "
+            . "Do not include any explanation or additional text. Only return the JSON object.";
+
 
         $postData = [
             "contents" => [

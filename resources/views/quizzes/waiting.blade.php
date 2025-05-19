@@ -129,6 +129,27 @@
                     });
             }, 3000);
         }
+        const interval = setInterval(() => {
+            fetch(`/arena/${arenaId}/question/${questionId}/check-status`)
+                .then(res => res.json())
+                .then(data => {
+                    //  console.log("Polling result:", data);
+
+                    if (data.status === 'finished') {
+                        clearInterval(interval);
+                        Swal.fire({
+                            title: 'Game Over!',
+                            text: 'Thanks for playing!',
+                            icon: 'info',
+                            confirmButtonText: 'OK',
+                        }).then(() => {
+                            window.location.href = "{{ route('quizzes.index') }}";
+
+                        });
+                    }
+
+                });
+        }, 3000);
     </script>
 
 

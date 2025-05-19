@@ -7,6 +7,9 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
+
+
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -25,7 +28,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'customer_id',
         'payment_method_id',
         'xp',
+        'profile_image',
         'current_plan_id',
+
     ];
     //'current_plan_id',
 
@@ -98,5 +103,13 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(XpTransaction::class);
     }
+
+    public function getProfileImageUrlAttribute()
+    {
+        return $this->profile_image
+            ? Storage::url($this->profile_image)
+            : asset('default-avatar.png'); // o una imagen por defecto
+    }
+
 
 }

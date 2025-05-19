@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use App\Models\Plan;
 use App\services\UsageService;
@@ -61,6 +62,27 @@ class ProfileController extends Controller
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
+
+        if ($request->hasFile('profile_image')) {
+            $image = $request->file('profile_image');
+
+            // Opcional: eliminar imagen anterior
+            if ($request->user()->profile_image && file_exists(public_path('images/' . $request->user()->profile_image))) {
+                unlink(public_path('images/' . $request->user()->profile_image));
+            }
+
+            // Crear un nombre único para la imagen
+            $imageName = time() . '_' . $request->user()->email . '.' . $image->extension();
+
+            // Mover la imagen a public/images
+            $image->move(public_path('images'), $imageName);
+
+            // Guardar el nombre del archivo en la BD
+            $user = $request->user();
+            $user->profile_image = $imageName;
+           // $user->save();
+        }
+
 
         $request->user()->save();
 

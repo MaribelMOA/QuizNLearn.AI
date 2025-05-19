@@ -122,9 +122,9 @@ class QuizController extends Controller
         $arenaTotalAvailable = $uses['arena_mode']['total_available']?? 7;
         $studyTotalAvailable = $uses['study_mode']['total_available']?? 7;
         $creationTotalAvailable = $uses['quiz_creation']['total_available']?? 7;
-//        $studyModeUses = 0;
-     //   $arenaModeUses = 50;
-     //   $availableCreations=0;
+//       $studyModeUses = 0;
+//        $arenaModeUses = 0;
+//     //   $availableCreations=0;
 
 
         $currentUserPlan = UserPlan::where('user_id', $userId)

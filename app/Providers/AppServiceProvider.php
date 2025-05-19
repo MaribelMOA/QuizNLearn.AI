@@ -38,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
                 $request->is('arena/*/question/*/result/*') ||
                 $request->is('arena/*/question/*/check-status') ||
                 $request->is('arena/*/current-question') ||
+
                 $request->is('arena/*/update-answer');
 
             $view->with('hideNavigation', $isQuizPage);

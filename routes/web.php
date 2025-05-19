@@ -76,10 +76,21 @@ Route::middleware('auth')->group(function () {
     Route::post('/join-arena', [ArenaGameController::class, 'joinGame'])->name('arena.join');
     Route::post('/arena/{arena}/remove-player', [ArenaGameController::class, 'removePlayer'])->name('arena.removePlayer');
 
-    //LA VERDAD CREO QUE NOS E OCUPA
+
+//    Route::get('/arena/waiting', function () {
+//        return view('quizzes.waiting');
+//    })->name('arena.waiting');
     Route::get('/arena/waiting', function () {
-        return view('quizzes.waiting');
+        $playerId = session('arena_player_id');
+        $arenaGameId = session('arena_game_id');
+        $pin = session('arena_game_pin');
+        $score = 0;
+
+        $player = \App\Models\ArenaPlayer::find($playerId);
+
+        return view('quizzes.waiting', compact('player', 'arenaGameId', 'pin', 'score'));
     })->name('arena.waiting');
+
 
     ////POLLING ARENA:
 
