@@ -11,7 +11,8 @@ class PlayModesService
     {
       //  Log::info("ai supposed to check answer ");
         $apiKey = config('services.gemini.key');
-        $url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=$apiKey";
+        //$url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=$apiKey";
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey";
 
         $prompt = "You are an expert evaluator. Given the question: '$question' and the user's answer: '$userAnswer', determine if the user's answer is factually and semantically correct based on your own knowledge of the topic. Only respond with: correct or incorrect. Do not include any explanation or additional text.";
 
@@ -74,7 +75,8 @@ class PlayModesService
     {
       //  Log::info("AI evaluating open question with feedback");
         $apiKey = config('services.gemini.key');
-        $url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=$apiKey";
+     //   $url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=$apiKey";
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey";
 
         $prompt = "You are an expert evaluator. Given the question: '$question' and the user's answer: '$userAnswer', decide whether the answer is factually and semantically correct based on your understanding of the question alone. "
             . "Respond strictly in JSON format like this: {\"result\": \"correct\" or \"incorrect\", \"feedback\": \"[brief feedback in English, max 150 characters]\"}. "
