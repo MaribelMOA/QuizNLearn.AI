@@ -20,7 +20,7 @@
         </p>
 
         <a href="{{ route('quizzes.index') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded">
-            Return to Quizz List
+            Return to Quiz List
         </a>
     </div>
 

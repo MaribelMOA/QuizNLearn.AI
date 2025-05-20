@@ -65,7 +65,7 @@
                                     if (hasOpenQuestions) {
                                         Swal.fire({
                                             title: 'Arena mode unavailable',
-                                            text: 'This quizz contains open answer questions and is not allowed to be player in Arena Mode.',
+                                            text: 'This quiz contains open answer questions and is not allowed to be player in Arena Mode.',
                                             icon: 'error',
                                             confirmButtonText: 'Accept'
                                         });

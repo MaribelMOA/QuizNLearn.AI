@@ -4,7 +4,7 @@
             <!-- Game Header -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
                 <div class="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-4 flex justify-between items-center">
-                    <h1 class="text-xl font-bold text-white">Resultados del Quiz</h1>
+                    <h1 class="text-xl font-bold text-white">Quiz Results</h1>
                     <span class="text-white font-medium">{{ $quiz?->title ?? '...' }}</span>
                 </div>
             </div>

@@ -42,15 +42,25 @@ class QuizController extends Controller
         $query = Quiz::where('user_id', $user->id);
 
         // Aplicar filtros de búsqueda
+//        if ($request->has('search') && !empty($request->search)) {
+//            $search = $request->search;
+//            $query->where(function($q) use ($search) {
+//                $q->where('title', 'like', "%{$search}%")
+//                    ->orWhere('difficulty_level', 'like', "%{$search}%")
+//                    ->orWhere('mode', 'like', "%{$search}%")
+//                    ->orWhere('num_questions', 'like', "%{$search}%");
+//            });
+//        }
         if ($request->has('search') && !empty($request->search)) {
-            $search = $request->search;
+            $search = strtolower($request->search);
             $query->where(function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('difficulty_level', 'like', "%{$search}%")
-                    ->orWhere('mode', 'like', "%{$search}%")
-                    ->orWhere('num_questions', 'like', "%{$search}%");
+                $q->whereRaw('LOWER(title) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(difficulty_level) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(mode) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('CAST(num_questions AS CHAR) LIKE ?', ["%{$search}%"]);
             });
         }
+
 
         // Filtrar por dificultad
         if ($request->has('difficulty') && !empty($request->difficulty)) {
