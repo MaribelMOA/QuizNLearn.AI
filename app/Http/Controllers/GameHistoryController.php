@@ -811,6 +811,15 @@ class GameHistoryController extends Controller
         // Por ejemplo, guardar resultados, actualizar el estado del juego, etc.
         $arenaGameId->status = 'finished';
         $arenaGameId->end_time = now();
+
+        $arenaGameId->players->each(function ($player) {
+            if (!$player->is_host && $player->user_id) {
+                $user = $player->user;
+                $user->xp += 5;
+                $user->save();
+            }
+        });
+
         $arenaGameId->players()->delete();
         $arenaGameId->save();
 
