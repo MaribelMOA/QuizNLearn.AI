@@ -214,6 +214,7 @@
 
                             <!-- Arena Mode -->
                             <button
+                                onclick="redirectToArenaMode()"
                                 class="px-6 py-3 rounded-md flex items-center transition-colors
                 {{ ($arenaModeUses == 0 || $hasOpenQuestions)  ? 'bg-gray-200 cursor-not-allowed text-gray-400 ' : 'bg-blue-500 hover:bg-blue-600 text-white' }}"
                                 {{ ($arenaModeUses == 0 || $hasOpenQuestions)  ? 'disabled' : '' }}>
@@ -323,6 +324,10 @@
         function redirectToStudyMode() {
             const selectedMode = 'yourModeHere'; // aquí pon el modo que quieras, o obténlo dinámicamente
             window.location.href = `/quizzes/play/{{ $quiz->id }}?mode=Study`;
+        }
+        function redirectToArenaMode() {
+            const selectedMode = 'yourModeHere'; // aquí pon el modo que quieras, o obténlo dinámicamente
+            window.location.href = `/quizzes/play/{{ $quiz->id }}?mode=Arena`;
         }
 
     </script>

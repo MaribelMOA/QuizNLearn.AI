@@ -366,7 +366,8 @@ class QuizController extends Controller
         }
 
         // Calcular avgScore (Promedio de puntajes)
-        $avgScore = $quiz->gameHistories()->whereNotNull('score')->avg('score');
+      //  $avgScore = $quiz->gameHistories()->whereNotNull('score')->avg('score');
+        $avgScore = number_format($quiz->gameHistories()->whereNotNull('score')->avg('score'), 2);
 
         // Calcular bestScore (Mejor puntaje)
         $bestScore = $quiz->gameHistories()->whereNotNull('score')->max('score');
