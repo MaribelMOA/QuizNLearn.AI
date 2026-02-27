@@ -199,13 +199,14 @@ class SummaryController extends Controller
 
         $content = QuizGenerationService::summarizeWithGemini($content);
 
-        $summary->update(['content' => $content]);
+
 
         if (!$content) {
             Log::error("Failed to generate summary properly.");
             $summary->delete();
             return response()->json(['success' => false, 'message' => 'Error generating the summary.'], 500);
         }
+        $summary->update(['content' => $content]);
 
         return response()->json(['success' => true, 'message' => 'Summary generated successfully.']);
     }
