@@ -39,7 +39,7 @@ El proyecto está construido bajo una arquitectura robusta y escalable:
 
 Si deseas ejecutar este proyecto localmente usando Laravel Sail:
 
-1. Clona el repositorio: `git clone https://github.com/tu-usuario/quiznlearn-ai.git`
+1. Clona el repositorio: `https://github.com/MaribelMOA/QuizNLearn.AI.git`
 2. Instala dependencias: `composer install`
 3. Levanta el entorno: `./vendor/bin/sail up`
 4. Ejecuta las migraciones: `./vendor/bin/sail artisan migrate`
