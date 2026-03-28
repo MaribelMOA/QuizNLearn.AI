@@ -36,7 +36,7 @@ class AuthenticatedSessionController extends Controller
         $userPlanController->createOrUpdateUserPlan(Auth::id());
 
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(route('quizzes.index', absolute: false));
     }
 
     /**
@@ -50,7 +50,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/login');
     }
 
     public function checkAndUpdatePlan()

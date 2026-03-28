@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Http\Controllers\XpPriceController;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -20,7 +21,35 @@ class DatabaseSeeder extends Seeder
 //            'name' => 'Test User',
 //            'email' => 'test@example.com',
 //        ]);
+        if (Plan::count() === 0) {
+            $this->call([
+                PlanSeeder::class,
+                QuestionTypeSeeder::class,
+                FeatureTypeSeeder::class,
+                FeatureSeeder::class,
+                XpPriceSeeder::class,
+            ]);
+        }
 
-        $this->call(PlanSeeder::class);
+
+
+        // $this->call([
+
+        //     PlanSeeder::class,
+        //     FeatureTypeSeeder::class,
+        //     FeatureSeeder::class,
+        //     XpPriceSeeder::class,
+        //     UserSeeder::class,
+        //     UserPlanSeeder::class,
+        //     FeatureTransactionSeeder::class,
+        //     XpTransactionSeeder::class,
+
+        //     QuestionTypeSeeder::class,
+        //     QuizSeeder::class,
+        //     QuizQuestionSeeder::class,
+        //     QuizQuestionTypeSyncSeeder::class, // <- aquí
+        //     QuizAnswerSeeder::class,
+
+        // ]);
     }
 }

@@ -11,13 +11,29 @@
 
 
 
-    <form id="send-verification" method="post" action="{{ route('verification.send') }}">
+    <form id="send-verification" method="post" action="{{ route('verification.send') }}" >
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6" enctype="multipart/form-data">
         @csrf
         @method('patch')
+
+        {{-- Campo de imagen de perfil --}}
+        <div>
+            <x-input-label for="profile_image" :value="__('Profile Image')" />
+            <input type="file" id="profile_image" name="profile_image" accept="image/*"
+                   class="mt-1 block w-full text-sm text-gray-600" />
+            <x-input-error class="mt-2" :messages="$errors->get('profile_image')" />
+
+            @if ($user->profile_image)
+                <img src="{{ asset('images/' . $user->profile_image) }}" class="mt-4 w-20 h-20 rounded-full object-cover" alt="Perfil">
+            @else
+                <img src="{{ asset('images/default-avatar.png') }}"
+                     class="mt-4 w-20 h-20 rounded-full object-cover" alt="Default Profile Image">
+            @endif
+        </div>
+
 
         <div>
             <x-input-label for="name" :value="__('Name')" />
@@ -71,6 +87,11 @@
                             <div class="flex flex-col items-center">
                                 <div class="text-xl font-semibold text-gray-800">{{ $plan->name }}</div>
                                 <div class="text-sm text-gray-500">{{ $plan->quizzes_allowed }} quiz creations</div>
+                                <div class="text-sm text-gray-500">- {{ $plan->quizzes_allowed }} quiz creations</div>
+                                <div class="text-sm text-gray-500">- {{ $plan->summaries_allowed }} summary creations</div>
+                                <div class="text-sm text-gray-500">- {{ $plan->study_mode_uses }} study mode uses</div>
+                                <div class="text-sm text-gray-500">- {{ $plan->arena_mode_uses }} arena mode uses</div>
+
                                 <div class="mt-2 text-lg font-bold text-gray-700">${{ number_format($plan->price, 2) }}</div>
                             </div>
                         </label>
@@ -133,7 +154,7 @@
 
 
         <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+            <x-primary-button>{{ __('Guardar Cambios') }}</x-primary-button>
 
             @if (session('status') === 'profile-updated')
                 <p

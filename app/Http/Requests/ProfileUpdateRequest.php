@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\models\Plan;
+use App\Models\Plan;
 
 class ProfileUpdateRequest extends FormRequest
 {
@@ -35,6 +35,8 @@ class ProfileUpdateRequest extends FormRequest
                 }),
                 'in:paypal,stripe',
             ],
+            'profile_image' => ['nullable', 'image', 'max:2048'], // 2MB máximo
+
 
         ];
     }

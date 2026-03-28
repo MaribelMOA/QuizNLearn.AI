@@ -58,7 +58,10 @@
                         peer-checked:bg-blue-100 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-300">
                             <div class="flex flex-col items-center">
                                 <div class="text-xl font-semibold text-gray-800">{{ $plan->name }}</div>
-                                <div class="text-sm text-gray-500">{{ $plan->quizzes_allowed }} quiz creations</div>
+                                <div class="text-sm text-gray-500">- {{ $plan->quizzes_allowed }} quiz creations</div>
+                                <div class="text-sm text-gray-500">- {{ $plan->summaries_allowed }} summary creations</div>
+                                <div class="text-sm text-gray-500">- {{ $plan->study_mode_uses }} study mode uses</div>
+                                <div class="text-sm text-gray-500">- {{ $plan->arena_mode_uses }} arena mode uses</div>
                                 <div class="mt-2 text-lg font-bold text-gray-700">${{ number_format($plan->price, 2) }}</div>
                             </div>
                         </label>
