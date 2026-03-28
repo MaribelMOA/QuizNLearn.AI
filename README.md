@@ -1,66 +1,45 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🚀 QuizNLearn.AI
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**QuizNLearn.AI** es una innovadora plataforma web diseñada para transformar la manera en que aprendemos y evaluamos conocimientos. Utilizando **Inteligencia Artificial**, el sistema permite generar cuestionarios interactivos de forma automática a partir de archivos PDF, URLs o texto plano, eliminando el tedioso proceso de creación manual de preguntas.
 
-## About Laravel
+Con un enfoque en la **gamificación** y el aprendizaje dinámico, la plataforma ofrece una experiencia completa que va desde el estudio autónomo hasta la competición en tiempo real.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🌟 Características Principales
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+* **Generación con IA:** Crea cuestionarios precisos y variados en segundos.
+* **Modos de Juego:** * 📖 **Modo Estudio:** Práctica con retroalimentación inmediata (tipo Duilingo).
+    * 📝 **Modo Quiz:** Evaluación estándar con estadísticas de rendimiento.
+    * 🏟️ **Modo Arena:** Competición en vivo al estilo Kahoot mediante códigos PIN.
+* **Sistema de XP:** Gamificación integrada donde los puntos de experiencia permiten desbloquear funciones premium.
+* **Exportación:** Descarga tus cuestionarios en formato PDF o JSON.
 
-## Learning Laravel
+## 🛠️ Stack Tecnológico
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+El proyecto está construido bajo una arquitectura robusta y escalable:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+* **Backend:** [PHP](https://www.php.net/) con el framework [Laravel](https://laravel.com/).
+* **Frontend:** [Blade Templates](https://laravel.com/docs/blade) y Tailwind.
+* **Entorno de Desarrollo:** [Laravel Sail](https://laravel.com/docs/sail) (Docker-based).
+* **Base de Datos:** [PostgreSQL](https://www.postgresql.org/).
+* **Despliegue:** [Laravel Cloud](https://laravel.com/cloud).
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 🔗 Enlaces de Interés
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+* **🌐 Aplicación en vivo:** [Acceder a QuizNLearn.AI](https://quiznlearnai-feature-final-gzpugr.laravel.cloud/)
+* **📄 Documentación Completa:** [Consulta aquí el PDF/Wiki](https://drive.google.com/file/d/1EN4eOP_gN6Wj5Gd9S2cuVxYNWM1FXXus/view?usp=drive_link)
+    * *Incluye: Requerimientos funcionales/no funcionales, Casos de Uso, Diagramas de Secuencia y Modelado de Base de Datos.*
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## 🚀 Instalación Rápida (Desarrollo)
 
-## Contributing
+Si deseas ejecutar este proyecto localmente usando Laravel Sail:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+1. Clona el repositorio: `git clone https://github.com/tu-usuario/quiznlearn-ai.git`
+2. Instala dependencias: `composer install`
+3. Levanta el entorno: `./vendor/bin/sail up`
+4. Ejecuta las migraciones: `./vendor/bin/sail artisan migrate`
