@@ -30,7 +30,7 @@ El proyecto está construido bajo una arquitectura robusta y escalable:
 ## 🔗 Enlaces de Interés
 
 * **🌐 Aplicación en vivo:** [Acceder a QuizNLearn.AI](https://quiznlearnai-feature-final-gzpugr.laravel.cloud/)
-* **📄 Documentación Completa:** [Consulta aquí el PDF/Wiki](https://drive.google.com/file/d/1EN4eOP_gN6Wj5Gd9S2cuVxYNWM1FXXus/view?usp=drive_link)
+* **📄 Documentación Completa:** [Consulta aquí el PDF](https://drive.google.com/file/d/1EN4eOP_gN6Wj5Gd9S2cuVxYNWM1FXXus/view?usp=drive_link)
     * *Incluye: Requerimientos funcionales/no funcionales, Casos de Uso, Diagramas de Secuencia y Modelado de Base de Datos.*
 
 ---
